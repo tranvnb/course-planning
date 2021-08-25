@@ -105,6 +105,15 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/course-planning/**/*.ts",
+              "projects/course-planning/**/*.html"
+            ]
+          }
         }
       }
     },
@@ -135,6 +144,15 @@
             "main": "projects/timetable/src/test.ts",
             "tsConfig": "projects/timetable/tsconfig.spec.json",
             "karmaConfig": "projects/timetable/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/timetable/**/*.ts",
+              "projects/timetable/**/*.html"
+            ]
           }
         }
       }
