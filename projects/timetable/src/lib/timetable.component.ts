@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'lib-timetable',
   template: ` <p>timetable works!</p> `,
-  styles: [],
+  styles: []
 })
 export class TimetableComponent implements OnInit {
-  constructor() {}
+  // constructor() {}
 
-  // ngOnInit(): void {
-  // }
+  ngOnInit(): void {
+    console.log('aa');
+  }
 }
