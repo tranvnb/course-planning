@@ -1,4 +1,9 @@
 {
   "singleQuote": true,
+<<<<<<< HEAD
   "useTabs": false
+=======
+  "useTabs": false,
+  "tabWidth": 2
+>>>>>>> 36f86809f8287a1e48ee2761c7781a022a813378
 }

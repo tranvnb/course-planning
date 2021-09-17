@@ -4,6 +4,10 @@
 
 export const environment = {
   production: false,
+<<<<<<< HEAD
+=======
+  API_URL: 'http://localhost:8080', // https://verbena-tundra-pufferfish.glitch.me
+>>>>>>> 36f86809f8287a1e48ee2761c7781a022a813378
 };
 
 /*
