@@ -28,9 +28,6 @@
         "@angular-eslint/component-selector": [
           "error",
           { "type": "element", "prefix": "app", "style": "kebab-case" }
-<<<<<<< HEAD
-        ]
-=======
         ],
 
         // "@typescript-eslint/naming-convention": ["warn"],
@@ -47,7 +44,6 @@
         "@typescript-eslint/no-redeclare": ["error"],
         "@typescript-eslint/no-shadow": ["error"],
         "@typescript-eslint/no-useless-constructor": ["warn"]
->>>>>>> 36f86809f8287a1e48ee2761c7781a022a813378
       }
     },
     {
