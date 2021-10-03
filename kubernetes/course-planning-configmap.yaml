@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: course-planning-configmap
+  namespace: course-planning
+data:
+  database_url: mongodb-service # service name of mongo db
