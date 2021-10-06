@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { AvailableCoursesComponent } from './available-courses/available-courses.component';
 import { PlanningBoardComponent } from './planning-board/planning-board.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { PlanningBoardComponent } from './planning-board/planning-board.componen
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    DragDropModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
