@@ -12,6 +12,19 @@ export class CourseService {
     const availabeCourses = of([
       { title: 'get to work' },
       { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
+      { title: 'picup groceries' },
       { title: 'run earrand' },
     ]);
     return availabeCourses;
@@ -22,6 +35,16 @@ export class CourseService {
       { title: 'To do 1' },
       { title: 'to do 2' },
       { title: 'To do 3' },
+      { title: 'To do 4' },
+      { title: 'To do 5' },
+      { title: 'To do 6' },
+      { title: 'To do 6' },
+      { title: 'To do 6' },
+      { title: 'To do 6' },
+      { title: 'To do 6' },
+      { title: 'To do 6' },
+      { title: 'To do 6' },
+      { title: 'To do 6' },
     ]);
     return todoCourses;
   }

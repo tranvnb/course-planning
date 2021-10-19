@@ -7,8 +7,10 @@
   border-radius: 4px;
   overflow: hidden;
   padding: 10px;
+  overflow: auto;
   .available-course {
-    flex-grow: 1;
+    // flex-grow: 1;
+    min-width: 200px;
     min-height: 100px;
     align-self: center;
   }

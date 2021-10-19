@@ -1,20 +1,23 @@
 .semester-container {
   display: flex;
   // flex-direction: column;
-  // height: calc(100vh - 150px);
-  padding: 10px;
+  height: calc(100vh - 300px);
+  // padding: 10px;
+  overflow-x: auto;
   .semester-list {
     // width: 100%;
-    overflow-x: auto;
+    // overflow-x: auto;
     display: flex;
     flex-direction: row;
     flex-grow: 1;
     .semester {
       min-height: 100px;
-      height: 100%;
+      // height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
     .semester + .semester {
-      padding-left: 10px;
+      // padding-left: 10px;
     }
   }
 }

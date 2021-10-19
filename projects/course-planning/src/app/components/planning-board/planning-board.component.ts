@@ -31,13 +31,17 @@ export class PlanningBoardComponent implements OnInit {
     this.semesterList = [
       this.todo,
       this.done,
-      this.todo,
       this.done,
-      this.todo,
       this.done,
-      this.todo,
       this.done,
-      this.todo,
+      this.done,
+      this.done,
+      this.done,
+      this.done,
+      this.done,
+      this.done,
+      this.done,
+      this.done,
       this.done,
     ];
   }

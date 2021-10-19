@@ -1,9 +1,11 @@
 .semester {
-  height: 100%;
-  margin: 10px;
+  margin: 5px;
+  min-width: 200px;
   .semester-course-list {
-    height: 100%;
     min-height: 100px;
+    .semester-box + .semester-box {
+      margin-top: 5px;
+    }
   }
 }
 .cdk-drag-preview {
