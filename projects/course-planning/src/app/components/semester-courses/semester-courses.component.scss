@@ -1,6 +1,13 @@
 .semester {
   margin: 5px;
   min-width: 200px;
+  .semester-action-icons {
+    float: right;
+    position: relative;
+    top: -5px;
+    right: -10px;
+    cursor: pointer;
+  }
   .semester-course-list {
     min-height: 100px;
     .semester-box + .semester-box {

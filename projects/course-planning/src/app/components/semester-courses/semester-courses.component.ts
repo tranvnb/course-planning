@@ -23,4 +23,8 @@ export class SemesterCoursesComponent implements OnInit {
   drop(event: CdkDragDrop<ICourse[]>): void {
     this.onItemDrop.emit(event);
   }
+
+  delete($event: Number) {
+    console.log($event);
+  }
 }

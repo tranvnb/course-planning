@@ -1,5 +1,14 @@
 <mat-card class="semester">
-  <mat-card-title>Semester 1</mat-card-title>
+  <mat-card-title
+    >Semester 1
+    <mat-icon
+      (click)="delete(1)"
+      class="semester-action-icons"
+      aria-hidden="false"
+      aria-label="Close icon"
+      >delete</mat-icon
+    >
+  </mat-card-title>
   <mat-card-content>
     <div
       cdkDropList

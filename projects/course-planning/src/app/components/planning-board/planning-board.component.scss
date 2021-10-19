@@ -4,12 +4,15 @@
   height: calc(100vh - 300px);
   // padding: 10px;
   overflow-x: auto;
+  border: solid 1px #ccc;
+  border-radius: 4px;
   .semester-list {
     // width: 100%;
     // overflow-x: auto;
     display: flex;
     flex-direction: row;
     flex-grow: 1;
+
     .semester {
       min-height: 100px;
       // height: 100%;
