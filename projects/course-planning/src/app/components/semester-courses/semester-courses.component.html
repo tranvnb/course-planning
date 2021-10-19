@@ -1,0 +1,17 @@
+<mat-card class="semester">
+  <mat-card-title>Semester 1</mat-card-title>
+  <mat-card-content>
+    <div
+      cdkDropList
+      [cdkDropListData]="courses"
+      class="semester-course-list"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <!-- add check cdkDropListEnterPredicate of each item -->
+      <div class="semester-box" *ngFor="let item of courses" cdkDrag>
+        <!-- {{ item.title }} -->
+        <cp-course [course]="item"></cp-course>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
