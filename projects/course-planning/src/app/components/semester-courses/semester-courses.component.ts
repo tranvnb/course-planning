@@ -8,7 +8,7 @@ import { ICourse } from '../../interfaces/ICourse';
   styleUrls: ['./semester-courses.component.scss'],
 })
 export class SemesterCoursesComponent implements OnInit {
-  @Input('selected-courses')
+  @Input()
   courses: ICourse[] = [];
 
   @Output()
@@ -18,7 +18,9 @@ export class SemesterCoursesComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log("Semester init")
+  }
 
   drop(event: CdkDragDrop<ICourse[]>): void {
     this.onItemDrop.emit(event);

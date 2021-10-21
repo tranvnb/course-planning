@@ -1,18 +1,11 @@
 <div cdkDropListGroup>
   <!-- create a pretty layout -->
-  <cp-available-courses
-    [available-courses]="availableCourses"
-    (onItemDrop)="drop($event)"
-  ></cp-available-courses>
+  <cp-available-courses [available-courses]="availableCourses" (onItemDrop)="drop($event)"></cp-available-courses>
   <mat-card>
     <mat-card-content class="semester-container">
       <div class="semester-list">
-        <cp-semester-courses
-          class="semester"
-          *ngFor="let sem of semesterList"
-          [selected-courses]="sem"
-          (onItemDrop)="drop($event)"
-        ></cp-semester-courses>
+        <cp-semester-courses class="semester" *ngFor="let sem of semesterList" [courses]="sem"
+          (onItemDrop)="drop($event)"></cp-semester-courses>
       </div>
     </mat-card-content>
   </mat-card>
