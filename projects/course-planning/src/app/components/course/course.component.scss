@@ -1,0 +1,11 @@
+.course {
+  max-width: 200px;
+  max-height: 100px;
+  // flex-grow: 1;
+  // min-height: 200px;
+  font-size: 9px;
+  .mat-grid-tile-content {
+    flex-direction: column;
+  }
+  cursor: move;
+}
