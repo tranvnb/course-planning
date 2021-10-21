@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: angular-deployment
+  namespace: course-planning
+  labels:
+    app: app-angular
+    front-end: angular
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-angular
+  template:
+    metadata:
+      labels:
+        app: app-angular
+    spec:
+      volumes:
+        # - name: source-code
+        #   persistentVolumeClaim:
+        #     claimName: angular-source-code-pvc
+        # - name: localhost-directory
+        #   hostPath: 
+        #     path: /home/brianvo/projects/course-planning/
+        #     type: DirectoryOrCreate
+        - name: localhost-directory
+          persistentVolumeClaim:
+            claimName: hostpath-pvc
+      containers:
+        - name: angular
+          image: node # update to nodejs latest image
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-ce", "cd /hostpath-claim/;npm install @angular/cli;npm run start;"]
+          # command: [ "/bin/bash", "-ce", "tail -f /dev/null" ] # run the container forever
+          # args:
+          #   - "-ce"
+          #   - "cd /hostpath-claim/;"
+          #   - "npm install @angular/cli;"
+          #   - "npm run start;"
+          volumeMounts:
+          # - name: source-code # mount volume to pod
+          #   mountPath: "/local-claim" # TODO: check the path for running nodejs angular app, and then update the command for running
+          - name: localhost-directory
+            mountPath: /hostpath-claim/
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: "2"
+            requests:
+              memory: 1Gi
+              cpu: "1"
+          ports:
+            - containerPort: 8080 # this is only for developemnt, this is the listening port of the container
+          env:
+            - name: MONGODB_ADMINUSERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: course-planning-secret
+                  key: mongo-username
+            - name: MONGODB_ADMINPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: course-planning-secret
+                  key: mongo-password
+            - name: MONGODB_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: course-planning-configmap
+                  key: database_url
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-angular-service
+  namespace: course-planning
+spec:
+  selector:
+    app: app-angular
+  # type: LoadBalancer # Uncomment for external service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      # nodePort: 30000 # Uncomment for external service
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: app-angular-nodeport
+#   namespace: course-planning
+# spec:
+#   type: NodePort
+#   selector:
+#     app: app-angular
+#   ports:
+#   - port: 4200
+#     protocol: TCP
+#     targetPort: 4200
+#     nodePort: 30005

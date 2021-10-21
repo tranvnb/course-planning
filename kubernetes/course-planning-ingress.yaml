@@ -1,0 +1,53 @@
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: angular-ingress
+#   namespace: course-planning
+#   # annotations:
+#     # nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+#     # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+#     # nginx.ingress.kubernetes.io/ssl-redirect: "false"
+#     # kubernetes.io/ingress.class: "nginx"
+#     # nginx.ingress.kubernetes.io/service-upstream: "true"
+#     # nginx.ingress.kubernetes.io/rewrite-target: /
+#     # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+# spec:
+#   ingressClassName: nginx
+#   # tls:
+#   # - hosts:
+#   #   - myapp.com
+#   #     secretName: myapp-secret-tls
+#   rules:
+#     - host: courseplanning.localk8s.com
+#       http:
+#         paths:
+#           - path: "/"
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: app-angular-service
+#                 port:
+#                   number: 4200
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: angular-ingress
+  namespace: course-planning
+spec:
+  ingressClassName: nginx
+  # tls:
+  # - hosts:
+  #   - myapp.com
+  #     secretName: myapp-secret-tls
+  rules:
+    - host: courseplanning.localk8s.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-angular-service
+                port:
+                  number: 8080
