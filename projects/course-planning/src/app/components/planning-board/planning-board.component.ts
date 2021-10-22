@@ -6,6 +6,7 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+import { ISemester } from '../../interfaces/ISemester';
 
 @Component({
   selector: 'cp-planning-board',
@@ -21,29 +22,18 @@ export class PlanningBoardComponent implements OnInit {
 
   availableCourses: ICourse[] = [];
 
-  semesterList: ICourse[][] = [];
+  semesterList: ISemester[] = [];
 
   ngOnInit(): void {
     console.debug('Dashboard init');
     this.getDoneCourses();
     this.getTodoCourses();
     this.getAvailableCourses();
-    this.semesterList = [
-      this.todo,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-      this.done,
-    ];
+    this.getSemesters();
+  }
+
+  getSemesters(): void {
+    this.courseService.getSemesters().subscribe(sem => this.semesterList=sem)
   }
 
   getTodoCourses(): void {
@@ -81,6 +71,23 @@ export class PlanningBoardComponent implements OnInit {
         event.previousIndex,
         event.currentIndex
       );
+      // emit an event to notify the item changed
+      if (event.previousContainer.id === "available-courses") { // need inject token for this constant value
+        this.courseService.addCourseToSemester(event.item.data, this.semesterList[parseInt(event.container.id)])
+      } else {
+        this.courseService.removeCourseFromSemester(event.item.data as ICourse, this.semesterList[parseInt(event.container.id)])
+      }
+      console.log(event.previousContainer.data, event.container.data[event.currentIndex])
+      // console.log(event.previousContainer.id)
+      // console.log(event.container.id)
     }
+  }
+
+  addNewSemester(): void {
+    this.courseService.addSemester()
+  }
+
+  removeSemester(semester: ISemester): void {
+    this.courseService.deleteSemester(semester)
   }
 }

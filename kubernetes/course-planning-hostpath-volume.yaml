@@ -13,7 +13,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/run/desktop/mnt/host/c/Users/vnbao/Documents/temps/course-planning"
+    path: '/run/desktop/mnt/host/c/Users/vnbao/Documents/temps/course-planning'
     type: Directory
 ---
 apiVersion: v1

@@ -1,6 +1,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ICourse } from '../../interfaces/ICourse';
+import { ISemester } from '../../interfaces/ISemester';
 
 @Component({
   selector: 'cp-semester-courses',
@@ -8,25 +9,38 @@ import { ICourse } from '../../interfaces/ICourse';
   styleUrls: ['./semester-courses.component.scss'],
 })
 export class SemesterCoursesComponent implements OnInit {
+
   @Input()
-  courses: ICourse[] = [];
+  index: number = -1
+
+  @Input() 
+  semester: ISemester =  {
+    id: -1,
+    title:"",
+    courses: []
+  };
 
   @Output()
-  onItemDrop: EventEmitter<CdkDragDrop<ICourse[]>> = new EventEmitter<
+  itemDrop: EventEmitter<CdkDragDrop<ICourse[]>> = new EventEmitter<
     CdkDragDrop<ICourse[]>
   >();
 
-  constructor() {}
+  @Output()
+  removeSemester: EventEmitter<ISemester> = new EventEmitter<ISemester>()
+
+  constructor() {
+  }
 
   ngOnInit(): void {
-    console.log("Semester init")
+    console.log('Semester init');
   }
 
-  drop(event: CdkDragDrop<ICourse[]>): void {
-    this.onItemDrop.emit(event);
+  drop($event: CdkDragDrop<ICourse[]>): void {
+    this.itemDrop.emit($event);
   }
 
-  delete($event: Number) {
-    console.log($event);
+  delete($event: ISemester) {
+    console.log($event)
+    this.removeSemester.emit($event)
   }
 }

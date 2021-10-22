@@ -1,6 +1,7 @@
 import { ICourse } from './ICourse';
 
-interface ISemester {
-  title: String;
+export interface ISemester {
+  id: number;
+  title: string;
   courses: ICourse[];
 }

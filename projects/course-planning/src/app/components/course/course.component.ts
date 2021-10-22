@@ -13,6 +13,6 @@ export class CourseComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.course = <ICourse>{};
+    // this.course = <ICourse>{};
   }
 }

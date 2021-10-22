@@ -1,11 +1,13 @@
 <mat-card class="semester">
-  <mat-card-title>Semester 1
-    <mat-icon (click)="delete(1)" class="semester-action-icons" aria-hidden="false" aria-label="Close icon">delete
+  <mat-card-title>{{semester.title}}
+    <mat-icon (click)="delete(semester)" class="semester-action-icons" aria-hidden="false" aria-label="Close icon">
+      delete
     </mat-icon>
   </mat-card-title>
   <mat-card-content>
-    <div cdkDropList [cdkDropListData]="courses" class="semester-course-list" (cdkDropListDropped)="drop($event)">
-      <div class="semester-box" *ngFor="let item of courses" cdkDrag>
+    <div cdkDropList [cdkDropListData]="semester.courses" class="semester-course-list" [id]="index+''"
+      (cdkDropListDropped)="drop($event)">
+      <div class="semester-box" *ngFor="let item of semester.courses" cdkDrag>
         <cp-course [course]="item"></cp-course>
       </div>
     </div>
