@@ -4,11 +4,9 @@ import { ICourse } from '../interfaces/ICourse';
 import { ISemester } from '../interfaces/ISemester'
 
 type CoursePrerequisite = {
-  courseId: string,
-  // sastified: Boolean
-  // required: {
-  //   [key: string]: String[]
-  // }[]
+  courseId: string;
+  title: string;
+  credit: number;
   required: String[][]
 };
 
@@ -31,22 +29,26 @@ export class CourseService {
   )
 
   private availableCourses = new BehaviorSubject<ICourse[]>([
-    { courseId: "CSIS 1175", title: 'CSIS 1175' },
-    { courseId: "CSIS 1275", title: 'CSIS 1275' },
-    { courseId: "CSIS 2200", title: 'CSIS 2200' },
-    { courseId: "CSIS 2260", title: 'CSIS 2260' },
-    { courseId: "CSIS 2270", title: 'CSIS 2270' },
+    { courseId: "CSIS 1175", title: 'Introduction to Programming I', credit: 3 },
+    { courseId: "CSIS 1275", title: 'Introduction to Programming II', credit: 3 },
+    { courseId: "CSIS 2175", title: 'Adv Integrated Software Dev', credit: 3 },
+    { courseId: "CSIS 2200", title: 'Systems Analysis and Design', credit: 3 },
+    { courseId: "CSIS 2260", title: 'Operating Systems', credit: 3 },
+    { courseId: "CSIS 2270", title: 'Virtualization and Computer Networking', credit: 3 },
   ])
   private coursePrerequisite: CoursePrerequisite[] = [
-    {courseId: "CSIS 1175", required: []},
-    {courseId: "CSIS 1275", required: []},
-    {courseId: "CSIS 2200", required: []},
-    {courseId: "CSIS 2260", required: []},
-    {courseId: "CSIS 2270", required: []},
-    {courseId: "CSIS 2300", required: [["CSIS 2200"]]},
-    {courseId: "CSIS 3155", required: [["CSIS 2260"],["CSIS 2270"]]},
-    {courseId: "CSIS 3175", required: [["CSIS 1275"], ["CSIS 2175"]]},
-    {courseId: "CSIS 3275", required: [["CSIS 2200", "CSIS 1275"], ["CSIS 2200", "CSIS 2175"]]},
+    {courseId: "CSIS 1175", title: 'Introduction to Programming I', credit: 3, required: []},
+    {courseId: "CSIS 1275", title: 'Introduction to Programming II',credit: 3, required: []},
+    {courseId: "CSIS 2175", title: 'Adv Integrated Software Dev', credit: 3, required: []},
+    {courseId: "CSIS 2200", title: 'Systems Analysis and Design',credit: 3,required: []},
+    {courseId: "CSIS 2260", title: 'Operating Systems',credit: 3,required: []},
+    {courseId: "CSIS 2270", title: 'Virtualization and Computer Networking',credit: 3,required: []},
+    {courseId: "CSIS 2300", title: 'Database I',credit: 3,required: [["CSIS 2200"]]},
+    {courseId: "CSIS 3155", title: 'Computer Network Security',credit: 3,required: [["CSIS 2260"],["CSIS 2270"]]},
+    {courseId: "CSIS 3175", title: 'Mobile Application Development I',credit: 3,required: [["CSIS 1275"], ["CSIS 2175"]]},
+    {courseId: "CSIS 3160", title: 'Evidence Imaging',credit: 3,required: [["CSIS 2260"]]},
+    {courseId: "CSIS 3275",title: 'Software Engineering',credit: 3, required: [["CSIS 2200", "CSIS 1275"], ["CSIS 2200", "CSIS 2175"]]},
+    {courseId: "CSIS 3270", title: 'Advanced Networking',credit: 3,required: [["CSIS 2270"]]},
   ]
 
   constructor() {}
@@ -102,7 +104,7 @@ export class CourseService {
     const allAvailableCourse = this.coursePrerequisite.filter(reqCourse => 
       reqCourse.required?.length === 0 
       || reqCourse.required?.some(set => set.every(courseId => tookCourse.find(took => took.courseId === courseId))))
-      .map(result => <ICourse>{courseId: result.courseId, title: result.courseId})
+      .map(result => <ICourse>{courseId: result.courseId, title: result.title, credit: result.credit})
     // then filter with current took course and current working semester
     const workingSemester = values[values.length - 1]?.courses
     this.availableCourses.next(allAvailableCourse.filter(c => !tookCourse.find(t => t.courseId === c.courseId) && !workingSemester.find(w => w.courseId === c.courseId)))
