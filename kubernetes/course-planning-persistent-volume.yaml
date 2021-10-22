@@ -12,7 +12,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: "local-storage"
+  storageClassName: 'local-storage'
   claimRef: # prefer which persistent volume claim can be bounded to this
     name: angular-source-code-pvc # only pvc whose name is "angular-source-code-pvc" can bind to this volume
     namespace: course-planning
@@ -24,23 +24,23 @@ spec:
   #   server: 172.17.0.2
   local:
     # local-claim/home/brianvo/projects/course-planning/
-    path: "/home/brianvo/projects/course-planning/" # TODO: check if can be used with configMap - home/brianvo/projects/course-planning
+    path: '/home/brianvo/projects/course-planning/' # TODO: check if can be used with configMap - home/brianvo/projects/course-planning
   nodeAffinity: # should use nodeAffinity when using local type (kubectl get nodes --show-labels)
     required:
       nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - docker-desktop # this can be get from describe nodes, this is node name `kubectl get nodes`
-        # - key: front-end
-        #   operator: In
-        #   values:
-        #   - angular
-        # - key: app
-        #   operator: In
-        #   values:
-        #   - app-angular
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - docker-desktop # this can be get from describe nodes, this is node name `kubectl get nodes`
+          # - key: front-end
+          #   operator: In
+          #   values:
+          #   - angular
+          # - key: app
+          #   operator: In
+          #   values:
+          #   - app-angular
 
 ---
 apiVersion: v1
@@ -49,7 +49,7 @@ metadata:
   name: angular-source-code-pvc
   namespace: course-planning
 spec:
-  storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+  storageClassName: '' # Empty string must be explicitly set otherwise default StorageClass will be set
   # volumeName: angular-source-code-pv # use specific volume name
   volumeMode: Filesystem
   accessModes:
@@ -62,4 +62,3 @@ spec:
       volume: angular-source-code
     # matchExpressions: # or match experessions
     #   - {key: environment, operator: In, values: [dev]}
-      

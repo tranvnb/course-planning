@@ -1,0 +1,13 @@
+<mat-card>
+  <mat-card-title> Available courses </mat-card-title>
+  <mat-card-content>
+    <div class="available-courses-container">
+      <div cdkDropList cdkDropListOrientation="horizontal" [cdkDropListData]="courses" class="available-course-list"
+        id="available-courses" [attr.data-drop-area-type]="'available-courses'" (cdkDropListDropped)="drop($event)">
+        <div class="available-course" *ngFor="let item of courses" cdkDrag>
+          <cp-course [course]="item"></cp-course>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

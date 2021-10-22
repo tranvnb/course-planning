@@ -21,7 +21,7 @@ spec:
         #   persistentVolumeClaim:
         #     claimName: angular-source-code-pvc
         # - name: localhost-directory
-        #   hostPath: 
+        #   hostPath:
         #     path: /home/brianvo/projects/course-planning/
         #     type: DirectoryOrCreate
         - name: localhost-directory
@@ -31,7 +31,12 @@ spec:
         - name: angular
           image: node # update to nodejs latest image
           imagePullPolicy: IfNotPresent
-          command: ["/bin/bash", "-ce", "cd /hostpath-claim/;npm install @angular/cli;npm run start;"]
+          command:
+            [
+              '/bin/bash',
+              '-ce',
+              'cd /hostpath-claim/;npm install @angular/cli;npm run start;',
+            ]
           # command: [ "/bin/bash", "-ce", "tail -f /dev/null" ] # run the container forever
           # args:
           #   - "-ce"
@@ -39,17 +44,17 @@ spec:
           #   - "npm install @angular/cli;"
           #   - "npm run start;"
           volumeMounts:
-          # - name: source-code # mount volume to pod
-          #   mountPath: "/local-claim" # TODO: check the path for running nodejs angular app, and then update the command for running
-          - name: localhost-directory
-            mountPath: /hostpath-claim/
+            # - name: source-code # mount volume to pod
+            #   mountPath: "/local-claim" # TODO: check the path for running nodejs angular app, and then update the command for running
+            - name: localhost-directory
+              mountPath: /hostpath-claim/
           resources:
             limits:
               memory: 2Gi
-              cpu: "2"
+              cpu: '2'
             requests:
               memory: 1Gi
-              cpu: "1"
+              cpu: '1'
           ports:
             - containerPort: 8080 # this is only for developemnt, this is the listening port of the container
           env:
@@ -84,7 +89,6 @@ spec:
       port: 8080
       targetPort: 8080
       # nodePort: 30000 # Uncomment for external service
-
 # ---
 # apiVersion: v1
 # kind: Service
