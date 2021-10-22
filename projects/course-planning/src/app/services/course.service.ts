@@ -103,8 +103,9 @@ export class CourseService {
       reqCourse.required?.length === 0 
       || reqCourse.required?.some(set => set.every(courseId => tookCourse.find(took => took.courseId === courseId))))
       .map(result => <ICourse>{courseId: result.courseId, title: result.courseId})
-    // then filter with current took course
-    this.availableCourses.next(allAvailableCourse.filter(c => !tookCourse.find(t => t.courseId === c.courseId)))
+    // then filter with current took course and current working semester
+    const workingSemester = values[values.length - 1]?.courses
+    this.availableCourses.next(allAvailableCourse.filter(c => !tookCourse.find(t => t.courseId === c.courseId) && !workingSemester.find(w => w.courseId === c.courseId)))
   }
 
 }
