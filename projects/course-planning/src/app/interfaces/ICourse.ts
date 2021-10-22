@@ -1,4 +1,5 @@
 export interface ICourse {
+  courseId: string;
   title: string;
   // subject: String,
   // credit: number;

@@ -49,6 +49,6 @@ export class SemesterCoursesComponent implements OnInit {
 
   // onlyTheLastSemester = () => this.lastOne
   onlyTheLastSemester(lastOne: boolean) : (item: CdkDrag<any>, drop: CdkDropList<any>) => boolean {
-  return (item: CdkDrag<any>, drop: CdkDropList<any>) => lastOne
+    return (item: CdkDrag<any>, drop: CdkDropList<any>) => lastOne
   }
 }
