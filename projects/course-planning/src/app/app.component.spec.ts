@@ -16,18 +16,19 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'course-planning'`, () => {
+  it(`should have as title 'Douglas PBDCIS - Course Planning'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('course-planning');
+    expect(app.title).toEqual('Douglas PBDCIS - Course Planning');
   });
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain(
-      'course-planning app is running!'
-    );
-  });
+  // it('should render available courses', () => {
+  //   const fixture = TestBed.createComponent(AppComponent);
+  //   fixture.detectChanges();
+  //   const compiled = fixture.nativeElement as HTMLElement;
+  //   console.log("aaaaaaaaaa", compiled.querySelector('.available-courses')?.textContent)
+  //   expect(compiled.querySelector('cp-available-courses.available-courses > .mat-card-title')?.textContent).toContain(
+  //     'Available courses'
+  //   );
+  // });
 });

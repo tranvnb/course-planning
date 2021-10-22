@@ -21,4 +21,11 @@ describe('AvailableCoursesComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+    it('should render available courses', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('mat-card-title')?.textContent).toContain(
+      'Available courses'
+    );
+  });
 });

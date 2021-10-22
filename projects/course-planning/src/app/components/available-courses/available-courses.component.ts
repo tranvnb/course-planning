@@ -8,7 +8,7 @@ import { ICourse } from '../../interfaces/ICourse';
   styleUrls: ['./available-courses.component.scss'],
 })
 export class AvailableCoursesComponent implements OnInit {
-  @Input('available-courses')
+  @Input("availableCourses")
   courses: ICourse[] = [];
 
   @Output()
