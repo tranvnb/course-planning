@@ -1,11 +1,13 @@
-<mat-card class="semester">
+<mat-card class="semester" [class.last-one]="lastOne">
   <mat-card-title>{{semester.title}}
-    <mat-icon (click)="delete(semester)" class="semester-action-icons" aria-hidden="false" aria-label="Close icon">
+    <mat-icon *ngIf="lastOne" (click)="delete(semester)" class="semester-action-icons" aria-hidden="false"
+      aria-label="Close icon">
       delete
     </mat-icon>
   </mat-card-title>
   <mat-card-content>
     <div cdkDropList [cdkDropListData]="semester.courses" class="semester-course-list" [id]="index+''"
+      [cdkDropListEnterPredicate]="onlyTheLastSemester(lastOne)" [cdkDropListDisabled]="!lastOne"
       (cdkDropListDropped)="drop($event)">
       <div class="semester-box" *ngFor="let item of semester.courses" cdkDrag>
         <cp-course [course]="item"></cp-course>

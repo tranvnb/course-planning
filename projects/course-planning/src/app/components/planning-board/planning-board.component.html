@@ -5,7 +5,8 @@
     <mat-card-content class="semester-container">
       <div class="semester-list">
         <cp-semester-courses class="semester" *ngFor="let sem of semesterList; let i=index" [semester]="sem" [index]="i"
-          (removeSemester)="removeSemester($event)" (itemDrop)="drop($event)"></cp-semester-courses>
+          [lastOne]="(i===semesterList.length-1)" (removeSemester)="removeSemester($event)" (itemDrop)="drop($event)">
+        </cp-semester-courses>
       </div>
       <div class="semester-list-addnew">
         <mat-icon (click)="addNewSemester()">add</mat-icon>

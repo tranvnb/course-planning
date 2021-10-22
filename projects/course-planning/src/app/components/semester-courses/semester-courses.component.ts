@@ -1,4 +1,4 @@
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ICourse } from '../../interfaces/ICourse';
 import { ISemester } from '../../interfaces/ISemester';
@@ -20,6 +20,9 @@ export class SemesterCoursesComponent implements OnInit {
     courses: []
   };
 
+  @Input()
+  lastOne:boolean = false
+
   @Output()
   itemDrop: EventEmitter<CdkDragDrop<ICourse[]>> = new EventEmitter<
     CdkDragDrop<ICourse[]>
@@ -32,7 +35,7 @@ export class SemesterCoursesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('Semester init');
+    console.log("on init", this.lastOne);
   }
 
   drop($event: CdkDragDrop<ICourse[]>): void {
@@ -42,5 +45,10 @@ export class SemesterCoursesComponent implements OnInit {
   delete($event: ISemester) {
     console.log($event)
     this.removeSemester.emit($event)
+  }
+
+  // onlyTheLastSemester = () => this.lastOne
+  onlyTheLastSemester(lastOne: boolean) : (item: CdkDrag<any>, drop: CdkDropList<any>) => boolean {
+  return (item: CdkDrag<any>, drop: CdkDropList<any>) => lastOne
   }
 }

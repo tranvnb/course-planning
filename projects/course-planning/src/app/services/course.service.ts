@@ -69,6 +69,8 @@ export class CourseService {
   }
 
   deleteSemester(semester: ISemester): void {
+    // return courses to the available list
+    this.availableCourses.next([...this.availableCourses.getValue(), ...semester.courses])
     this.semesterList.next(this.semesterList.value.filter(s => s.id !== semester.id))
   }
 
