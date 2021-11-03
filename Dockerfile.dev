@@ -26,7 +26,3 @@ RUN npm run build
 RUN chmod +x ./docker-entrypoint.sh
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-
-# FROM nginx
-
-# COPY --from=builder /srv/angular/dist/course-planning /usr/share/nginx/html
