@@ -15,17 +15,11 @@ WORKDIR /srv/angular
 
 COPY . .
 
-EXPOSE 4200 49152
-
 WORKDIR /srv/angular/
 
 RUN npm install
 
 RUN npm run build
-
-# RUN chmod +x ./docker-entrypoint.sh
-
-# ENTRYPOINT ["./docker-entrypoint.sh"]
 
 FROM nginx
 
