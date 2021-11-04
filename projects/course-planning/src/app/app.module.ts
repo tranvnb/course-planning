@@ -12,6 +12,7 @@ import { PlanningBoardComponent } from './components/planning-board/planning-boa
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SemesterCoursesComponent } from './components/semester-courses/semester-courses.component';
 import { CourseComponent } from './components/course/course.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { CourseComponent } from './components/course/course.component';
     CourseComponent,
   ],
   imports: [
+    HttpClientModule,
     MatIconModule,
     MatGridListModule,
     MatCardModule,
