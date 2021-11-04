@@ -2,6 +2,8 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.2.
 
+![image](https://user-images.githubusercontent.com/9379521/140168222-4e8db2c5-f364-4c8c-b650-3f6bd5883238.png)
+
 ## Development server
 
 Reference `angular.json` file for port and ip restriction (default is 4200 and from any ip addresses)
