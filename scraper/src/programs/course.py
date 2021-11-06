@@ -1,3 +1,6 @@
+import json
+from json import JSONEncoder
+
 class Course:
   title = ""
   credit = 3
@@ -21,3 +24,10 @@ class Course:
 
   def toString(self):
     return self.title + " = " + self.url + " = " + self.credit
+  
+  # def __repr__(self):
+  #       return json.dumps(self.__dict__)
+
+class CourseEncoder(JSONEncoder):
+      def default(self, o):
+          return o.__dict__

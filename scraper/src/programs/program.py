@@ -3,8 +3,10 @@ import requests
 import re
 import sys
 import os.path
+import json
 
 from course import Course
+from course import CourseEncoder
 # sys.path.append(
 #     os.path.abspath(os.path.join(os.path.dirname(__file__), "../authen")))
 # from authentication import Authentication
@@ -252,8 +254,10 @@ class Program:
                     options.append(self.extract_course_detail(row_tags[index], 2, 13))
             index += 1
 
-        ministream.append(options.copy())
+        ministream = [*ministream, *options]
         options.clear()
+
+        # print(ministream)
 
         index += 1
 
@@ -266,6 +270,19 @@ class Program:
             index += 1
 
         # Total Year II Credits
+
+        dictionary = {
+            "first_year" : firstYear,
+            "second_year": {
+                "stream1" : stream1, 
+                "stream2": stream2, 
+                "stream3": stream3
+            }
+        }
+        
+        json_object = json.dumps(dictionary, indent=2, cls=CourseEncoder)
+        self.save_file_content(current_path + "/test-json.json", json_object)
+        # self.export_json_file(current_path + "/test-json.json", dictionary)
 
         # print("this is all courses of program")   
         # for item in firstYear:
@@ -322,6 +339,10 @@ class Program:
             func()
         else:
             print("The program " + program_id + " has not been supported yet")
+
+    def export_json_file(self, filename, dictionary):
+        with open(filename, "w") as outfile:
+            json.dump(dictionary, outfile)
 
     @staticmethod
     def run():             
