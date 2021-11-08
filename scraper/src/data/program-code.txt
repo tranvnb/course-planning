@@ -1,0 +1,17 @@
+Post-Degree Diploma in Marketing : PDMARK
+Post-Degree Diploma in Sales: PDSALE
+Post-Degree Diploma in Project Management: PDPMGMT
+Post-Degree Diploma in International Business Management: PDIBM
+Post-Baccalaureate Diploma in International Supply Chain Management: PBDISCM
+Post-Degree Diploma in Data Analytics: PDDATA
+Post-Baccalaureate Diploma in Computer and Information Systems: PBDCIS
+Post-Degree Diploma in Hospitality Marketing: PDHOMK
+Post Baccalaureate Diploma in Hospitality Services Management: PBHSMT
+PDD Hospitality Management: PDDHOSP
+PDD Supply Chain Management: PDSCMGT
+PDD Accounting Studies: PDACCS
+PDD Accounting: PDACCT
+PBD Accounting: PBACCT
+PBD Accounting and Finance: PBACCF
+Information and Communication Technology: PDICT
+PBD Health Information Management: PDHIM

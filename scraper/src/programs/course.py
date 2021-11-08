@@ -5,12 +5,17 @@ class Course:
   title = ""
   credit = 3
   url = ""
-  prerequisites = [{}]
+  prerequisites = [[]]
   prerequisitesStr = ""
   course_code = "CSIS"
 
   def __init__(self):
-    pass
+    self.title = ""
+    self.credit = 3
+    self.url = ""
+    self.prerequisites = [[]]
+    self.prerequisitesStr = ""
+    self.course_code = "CSIS"
 
   @classmethod
   def withParameters(self, url, code, title, credit, prerequisitesStr):
@@ -19,7 +24,7 @@ class Course:
       course.course_code = code
       course.title = title
       course.credit = credit
-      course.prerequisites = [{}]
+      course.prerequisites = [[]]
       course.prerequisitesStr = prerequisitesStr.replace('\u00a0'," ").replace('\u201c', "").replace('\u201d', "").replace('\n', "")
       return course
 
