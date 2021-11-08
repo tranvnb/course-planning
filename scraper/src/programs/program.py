@@ -1,3 +1,4 @@
+import unicodedata
 from bs4 import BeautifulSoup
 import requests
 import re
@@ -14,6 +15,10 @@ class Program:
 
     # PBDCIS: https://www.douglascollege.ca/programs-courses/catalogue/programs/PBDCIS
     supported_program = ["PBDCIS"]
+
+    current_path = os.path.dirname(os.path.realpath(__file__))
+
+    domain_name = "https://www.douglascollege.ca"
 
     def __init__(self, program_id = ""):
         self.program_id = program_id
@@ -49,13 +54,27 @@ class Program:
         if (len(cols[0].find_all("a")) > 1):
             atags = cols[0].find_all("a")
             return [
-                Course.withParameters(atags[0]["href"], cols[1].get_text().strip().split("\nOR\n")[0], cols[2].get_text().strip()),
-                Course.withParameters(atags[1]["href"], cols[1].get_text().strip().split("\nOR\n")[1], cols[2].get_text().strip())
+                Course.withParameters(
+                    atags[0]["href"], 
+                    atags[0].get_text().strip(),
+                    cols[1].get_text().strip().split("\nOR\n")[0], 
+                    cols[2].get_text().strip(), 
+                    unicodedata.normalize("NFKD",self.extract_course_prerequisites(atags[0]["href"]))
+                ),
+                Course.withParameters(
+                    atags[1]["href"], 
+                    atags[1].text,
+                    cols[1].get_text().strip().split("\nOR\n")[1], 
+                    cols[2].get_text().strip(),
+                    unicodedata.normalize("NFKD",self.extract_course_prerequisites(atags[1]["href"]))
+                )
             ]
         else: 
             if cols[0] is not None and cols[0].find("a") is not None:
                 detail.append(cols[0].find("a")["href"])
                 course.url = cols[0].find("a")["href"]
+                course.course_code = cols[0].find("a").text
+                course.prerequisitesStr = unicodedata.normalize("NFKD",self.extract_course_prerequisites(cols[0].find("a")["href"]))
             else: 
                 return None
 
@@ -81,19 +100,21 @@ class Program:
         stream1 = []
         stream2 = []
         stream3 = []
-        firstYear = []
+        first_year = []
         secondYear = []
 
         # get html content from douglas website
-        url = "https://www.douglascollege.ca/programs-courses/catalogue/programs/PBDCIS"
-        url = "https://www.douglascollege.ca/program/pbdcis"
+        url = self.domain_name + "/course/csis-4495"
+        
         # result = requests.get(url, headers=self.requestHeaders())		
-        current_path = os.path.dirname(os.path.realpath(__file__))		
-        # self.save_file_content(current_path + "/data.txt", result.text)
-
-        #this is the indicator of the table content
+        # self.save_file_content(self.current_path + "/4495-prerequisites.txt", result.text)
+        
+        # url = self.domain_name + "/program/pbdcis"
+        # result = requests.get(url, headers=self.requestHeaders())		
+        # self.save_file_content(self.current_path + "/data.txt", result.text)
         # soup = BeautifulSoup(result.text, "html.parser")
-        result = self.get_file_content(current_path + "/data.txt")
+
+        result = self.get_file_content(self.current_path + "/data.txt")
         soup = BeautifulSoup(result, "html.parser")
         
         course_table = soup.find(id='block-views-block-program-guidelines-block-4').find("table")
@@ -127,10 +148,11 @@ class Program:
         # ========== "Select one of the following 2 options: ========== 
 
         while (index < len(row_tags) and not re.search(sel_option_1, str(row_tags[index]))):
-            if self.extract_course_detail(row_tags[index], 0, 1) != None: options.append(self.extract_course_detail(row_tags[index], 0, 1))
+            course_detail = self.extract_course_detail(row_tags[index], 0, 1)
+            if course_detail != None: options.append(course_detail)
             index += 1
 
-        firstYear.append(options.copy())
+        first_year.append(options.copy())
         options.clear()
 
         index += 1
@@ -138,10 +160,11 @@ class Program:
         # ==========  "Select one of the following 2 options:" ========== 
 
         while (index < len(row_tags) and not re.search(require_courses, str(row_tags[index]))):
-            if self.extract_course_detail(row_tags[index], 0, 2) != None: options.append(self.extract_course_detail(row_tags[index], 0, 2))
+            course_detail = self.extract_course_detail(row_tags[index], 0, 2)
+            if course_detail != None: options.append(course_detail)
             index += 1
 
-        firstYear.append(options.copy())
+        first_year.append(options.copy())
         options.clear()
 
         index += 1
@@ -149,7 +172,8 @@ class Program:
         # ========== "Required courses"  ========== 
 
         while (index < len(row_tags) and not re.search(sel_option_2, str(row_tags[index]))):
-            if self.extract_course_detail(row_tags[index], 0, 0) != None: firstYear.append(self.extract_course_detail(row_tags[index], 0, 0))			            
+            course_detail = self.extract_course_detail(row_tags[index], 0, 0)
+            if course_detail != None: first_year.append(course_detail)			            
             index += 1
 
         index += 1		
@@ -158,10 +182,11 @@ class Program:
 
         #third option of year 1, this will end at "Total Year I Credits"
         while (index < len(row_tags) and not re.search(total_year1, str(row_tags[index]))):
-            if self.extract_course_detail(row_tags[index], 0, 3) != None: options.append(self.extract_course_detail(row_tags[index], 0, 3))
+            course_detail = self.extract_course_detail(row_tags[index], 0, 3)
+            if course_detail != None: options.append(course_detail)
             index += 1
         
-        firstYear.append(options.copy())
+        first_year.append(options.copy())
         options.clear()
 
         # ========== "Total Year I Credits" ========== 
@@ -176,7 +201,8 @@ class Program:
         #==========  Select one of the following 2 options: ========== 
 
         while (index < len(row_tags) and not re.search(require_courses, str(row_tags[index]))):			
-            if self.extract_course_detail(row_tags[index], 1, 1) != None: options.append(self.extract_course_detail(row_tags[index], 1, 1))
+            course_detail = self.extract_course_detail(row_tags[index], 1, 1)
+            if course_detail != None: options.append(course_detail)
             index += 1
 
         stream1.append(options.copy())
@@ -187,7 +213,8 @@ class Program:
         #==========  Required courses ========== 
         
         while (index < len(row_tags) and not re.search(year2_op2, str(row_tags[index]))):			            
-            if self.extract_course_detail(row_tags[index], 1, 0) != None: stream1.append(self.extract_course_detail(row_tags[index], 1, 0))
+            course_detail = self.extract_course_detail(row_tags[index], 1, 0)
+            if course_detail != None: stream1.append(course_detail)
             index += 1
 
         #==========  Option 2 - Data Analytics Stream ========== 
@@ -201,7 +228,8 @@ class Program:
         #==========  Select one of the following 2 options ========== 
 
         while (index < len(row_tags) and not re.search(require_courses, str(row_tags[index]))):			
-            if self.extract_course_detail(row_tags[index], 2, 1) != None: options.append(self.extract_course_detail(row_tags[index], 2, 1))
+            course_detail = self.extract_course_detail(row_tags[index], 2, 1)
+            if course_detail != None: options.append(course_detail)
             index += 1
 
         stream2.append(options.copy())
@@ -212,7 +240,8 @@ class Program:
         #==========  Required courses ========== 
 
         while (index < len(row_tags) and not re.search(mini_stream, str(row_tags[index]))):			
-            if self.extract_course_detail(row_tags[index], 2, 0) != None: stream2.append(self.extract_course_detail(row_tags[index], 2, 0))
+            course_detail = self.extract_course_detail(row_tags[index], 2, 0)
+            if course_detail != None: stream2.append(course_detail)
             index += 1
 
         index += 1
@@ -227,8 +256,9 @@ class Program:
         # ==========  Business ========== 
 
         while (index < len(row_tags) and not re.search(mini2, str(row_tags[index]))):			
-            if self.extract_course_detail(row_tags[index], 2, 11) != None: 
-                options.append(self.extract_course_detail(row_tags[index], 2, 11))
+            course_detail = self.extract_course_detail(row_tags[index], 2, 11)
+            if course_detail != None: 
+                options.append(course_detail)
             index += 1
 
         ministream.append(options.copy())
@@ -236,8 +266,9 @@ class Program:
 
         #==========  CSIS ========== 
         while (index < len(row_tags) and not re.search(mini3, str(row_tags[index]))):			
-            if self.extract_course_detail(row_tags[index], 2, 12) != None: 
-                options.append(self.extract_course_detail(row_tags[index], 2, 12))
+            course_detail = self.extract_course_detail(row_tags[index], 2, 12)
+            if course_detail != None: 
+                options.append(course_detail)
             index += 1
 
         ministream.append(options.copy())
@@ -246,12 +277,12 @@ class Program:
         # ==========  Marketing ========== - THIS IS SPECIAL COL, NEED MANUALEDITING <a href="/course/mark-4360">MARK 4360</a> Customer Relationship Management
 
         while (index < len(row_tags) and not re.search(year2_op3, str(row_tags[index]))):			
-            result = self.extract_course_detail(row_tags[index], 2, 13)
-            if result != None:
-                if (isinstance(result, list)):
-                    options = list(map(lambda item : [item, *options], result))
+            course_detail = self.extract_course_detail(row_tags[index], 2, 13)
+            if course_detail != None:
+                if (isinstance(course_detail, list)):
+                    options = list(map(lambda item : [item, *options], course_detail))
                 else: 
-                    options.append(self.extract_course_detail(row_tags[index], 2, 13))
+                    options.append(course_detail)
             index += 1
 
         ministream = [*ministream, *options]
@@ -266,70 +297,25 @@ class Program:
         # ========== Option 3 - CyberSecurity Stream ========== 
 
         while (index < len(row_tags) and not re.search(total_year2, str(row_tags[index]))):	            
-            if self.extract_course_detail(row_tags[index], 3, 0) != None: stream3.append(self.extract_course_detail(row_tags[index], 3, 0))
+            course_detail = self.extract_course_detail(row_tags[index], 3, 0)
+            if course_detail != None: stream3.append(course_detail)
             index += 1
 
         # Total Year II Credits
 
         dictionary = {
-            "first_year" : firstYear,
+            "first_year" : first_year,
             "second_year": {
-                "stream1" : stream1, 
-                "stream2": stream2, 
-                "stream3": stream3
+                "emmerge-tech" : stream1, 
+                "data-analysis": stream2, 
+                "security": stream3
             }
         }
         
         json_object = json.dumps(dictionary, indent=2, cls=CourseEncoder)
-        self.save_file_content(current_path + "/test-json.json", json_object)
-        # self.export_json_file(current_path + "/test-json.json", dictionary)
+        #remove special & unseen characters \u00a0 \u201c \u201d \n
 
-        # print("this is all courses of program")   
-        # for item in firstYear:
-        #     if (isinstance(item, list)):
-        #         for subitem in item:
-        #             if (subitem != None): print('\t' + subitem.toString())
-        #     else:
-        #         print(item)
-        
-        # print(" Stream 1 ")
-        # for item in stream1:
-        #     if (isinstance(item, list)):
-        #         for subitem in item:
-        #             if (subitem != None): print("\t " + subitem.toString())
-        #     else:
-        #         print(item)
-
-        # print(ministream)
-        # print(" Stream 2")
-        # for item in ministream:
-        #     if (isinstance(item, list)):
-        #         print("----------")
-        #         for subitem in item:
-        #             if (not isinstance(subitem, list)):
-        #                 if (subitem != None):print("\t " + subitem.toString())
-        #             else:
-        #                 print("----------")
-        #                 for ssitem in subitem:
-        #                     if (ssitem != None): print("\t " + ssitem.toString())
-        #     else:
-        #         print(item)
-
-        # print(" Stream 3")
-        # for item in stream3:
-        #     if (isinstance(item, list)):
-        #         for subitem in item:
-        #             if (subitem != None): print("\t " + subitem).toString()
-        #     else:
-        #         print(item)
-
-
-    def post_all_data_to_strapi(self, data = []):
-        #there should be a call to post all data to Strapi api service, but I have not finished yet :)
-        # so I print them out to console instead
-        for item in data:
-            print(item)
-        return
+        self.save_file_content(self.current_path + "/program-pathway.json", json_object)
 
     def extract_all_courses_of_program(self, program_id):
         if program_id in self.supported_program:
@@ -344,6 +330,36 @@ class Program:
         with open(filename, "w") as outfile:
             json.dump(dictionary, outfile)
 
+    def extract_course_prerequisites(self, course_url):
+        result = ""
+        # self.domain_name = "https://www.douglascollege.ca"
+        # course_url = "/course/csis-4495" 
+        # course_url = "/course/csis-4050"
+
+        url = self.domain_name + course_url
+        html_result = requests.get(url, headers=self.requestHeaders())
+        soup = BeautifulSoup(html_result.text, "html.parser")
+        
+        # self.save_file_content(self.current_path + "/4050-prerequisites.txt", html_result.text)
+
+        # html_result = self.get_file_content(self.current_path + "/4050-prerequisites.txt")
+        # html_result = self.get_file_content(self.current_path + "/4495-prerequisites.txt")
+        # soup = BeautifulSoup(html_result, "html.parser")
+        prerequisites = soup.find(id='block-views-block-course-guidlines-block-3').find('div',{"class":'field--name-field-prerequisites'})
+        # all_p_tags = prerequisites.findAll('p')
+        
+        # 4495
+        # print(prerequisites.text) # ul > li
+        
+        # 4050
+        # print(all_p_tags[0].text)
+        # print(all_p_tags[1].text)
+        # print(all_p_tags[2].text)
+        
+        result = prerequisites.text
+
+        return result
+
     @staticmethod
     def run():             
         if len(sys.argv) == 1:
@@ -351,3 +367,4 @@ class Program:
         else:        
             pg = Program()
             pg.extract_all_courses_of_program(sys.argv[1])
+            # pg.extract_course_prerequisites("","")

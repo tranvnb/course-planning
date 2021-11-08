@@ -4,7 +4,7 @@ Install and update python library, make sure `venv` was installed on the system
 
 ```bash
   $ sudo apt update && sudo apt install python
-  $ sudo apt install python3-venv
+  $ sudo apt install python3.9-venv
 ```
 
 Run `python3 -m venv .` to init virtual development environment
@@ -27,4 +27,4 @@ Run `pip freeze > requirements.txt` to save all install packages
 
 ## Running application
 
-Run `python3 src/program PBDCIS` to fetch data.
+Run `python3 src/programs PBDCIS` to fetch data.
