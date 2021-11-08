@@ -8,12 +8,9 @@ import json
 
 from course import Course
 from course import CourseEncoder
-# sys.path.append(
-#     os.path.abspath(os.path.join(os.path.dirname(__file__), "../authen")))
-# from authentication import Authentication
+
 class Program:
 
-    # PBDCIS: https://www.douglascollege.ca/programs-courses/catalogue/programs/PBDCIS
     supported_program = ["PBDCIS"]
 
     current_path = os.path.dirname(os.path.realpath(__file__))
@@ -109,10 +106,10 @@ class Program:
         # result = requests.get(url, headers=self.requestHeaders())		
         # self.save_file_content(self.current_path + "/4495-prerequisites.txt", result.text)
         
-        # url = self.domain_name + "/program/pbdcis"
-        # result = requests.get(url, headers=self.requestHeaders())		
+        url = self.domain_name + "/program/pbdcis"
+        result = requests.get(url, headers=self.requestHeaders())		
+        soup = BeautifulSoup(result.text, "html.parser")
         # self.save_file_content(self.current_path + "/data.txt", result.text)
-        # soup = BeautifulSoup(result.text, "html.parser")
 
         result = self.get_file_content(self.current_path + "/data.txt")
         soup = BeautifulSoup(result, "html.parser")
@@ -332,33 +329,13 @@ class Program:
 
     def extract_course_prerequisites(self, course_url):
         result = ""
-        # self.domain_name = "https://www.douglascollege.ca"
-        # course_url = "/course/csis-4495" 
-        # course_url = "/course/csis-4050"
 
         url = self.domain_name + course_url
         html_result = requests.get(url, headers=self.requestHeaders())
         soup = BeautifulSoup(html_result.text, "html.parser")
         
-        # self.save_file_content(self.current_path + "/4050-prerequisites.txt", html_result.text)
-
-        # html_result = self.get_file_content(self.current_path + "/4050-prerequisites.txt")
-        # html_result = self.get_file_content(self.current_path + "/4495-prerequisites.txt")
-        # soup = BeautifulSoup(html_result, "html.parser")
         prerequisites = soup.find(id='block-views-block-course-guidlines-block-3').find('div',{"class":'field--name-field-prerequisites'})
-        # all_p_tags = prerequisites.findAll('p')
-        
-        # 4495
-        # print(prerequisites.text) # ul > li
-        
-        # 4050
-        # print(all_p_tags[0].text)
-        # print(all_p_tags[1].text)
-        # print(all_p_tags[2].text)
-        
-        result = prerequisites.text
-
-        return result
+        return prerequisites.text
 
     @staticmethod
     def run():             
@@ -367,4 +344,3 @@ class Program:
         else:        
             pg = Program()
             pg.extract_all_courses_of_program(sys.argv[1])
-            # pg.extract_course_prerequisites("","")
