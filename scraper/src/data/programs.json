@@ -238,7 +238,7 @@
     ]
   ],
   "second_year": {
-    "emmerge-tech": [
+    "emmerge_tech": [
       [
         {
           "url": "/course/csis-3540",
@@ -405,7 +405,7 @@
         "credit": "3.00"
       }
     ],
-    "data-analysis": [
+    "data_analysis": [
       [
         {
           "url": "/course/csis-3190",

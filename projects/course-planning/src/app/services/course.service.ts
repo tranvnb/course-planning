@@ -2,13 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { ICourse } from '../interfaces/ICourse';
 import { ISemester } from '../interfaces/ISemester';
-
-type CoursePrerequisite = {
-  courseId: string;
-  title: string;
-  credit: number;
-  required: String[][];
-};
+import { CoursePrerequisite } from '../interfaces/CoursePrerequisites';
+import { DEFAULT_COURSES, COURSE_PREREQUISITES } from './program-courses';
 
 @Injectable({
   providedIn: 'root',
@@ -24,103 +19,10 @@ export class CourseService {
     // {id: 0, title: "Semester 1", courses: [{ title: 'CSIS 1175' }]}
   ]);
 
-  private availableCourses = new BehaviorSubject<ICourse[]>([
-    {
-      courseId: 'CSIS 1175',
-      title: 'Introduction to Programming I',
-      credit: 3,
-    },
-    {
-      courseId: 'CSIS 1275',
-      title: 'Introduction to Programming II',
-      credit: 3,
-    },
-    { courseId: 'CSIS 2175', title: 'Adv Integrated Software Dev', credit: 3 },
-    { courseId: 'CSIS 2200', title: 'Systems Analysis and Design', credit: 3 },
-    { courseId: 'CSIS 2260', title: 'Operating Systems', credit: 3 },
-    {
-      courseId: 'CSIS 2270',
-      title: 'Virtualization and Computer Networking',
-      credit: 3,
-    },
-  ]);
-  private coursePrerequisite: CoursePrerequisite[] = [
-    {
-      courseId: 'CSIS 1175',
-      title: 'Introduction to Programming I',
-      credit: 3,
-      required: [],
-    },
-    {
-      courseId: 'CSIS 1275',
-      title: 'Introduction to Programming II',
-      credit: 3,
-      required: [],
-    },
-    {
-      courseId: 'CSIS 2175',
-      title: 'Adv Integrated Software Dev',
-      credit: 3,
-      required: [],
-    },
-    {
-      courseId: 'CSIS 2200',
-      title: 'Systems Analysis and Design',
-      credit: 3,
-      required: [],
-    },
-    {
-      courseId: 'CSIS 2260',
-      title: 'Operating Systems',
-      credit: 3,
-      required: [],
-    },
-    {
-      courseId: 'CSIS 2270',
-      title: 'Virtualization and Computer Networking',
-      credit: 3,
-      required: [],
-    },
-    {
-      courseId: 'CSIS 2300',
-      title: 'Database I',
-      credit: 3,
-      required: [['CSIS 2200']],
-    },
-    {
-      courseId: 'CSIS 3155',
-      title: 'Computer Network Security',
-      credit: 3,
-      required: [['CSIS 2260'], ['CSIS 2270']],
-    },
-    {
-      courseId: 'CSIS 3175',
-      title: 'Mobile Application Development I',
-      credit: 3,
-      required: [['CSIS 1275'], ['CSIS 2175']],
-    },
-    {
-      courseId: 'CSIS 3160',
-      title: 'Evidence Imaging',
-      credit: 3,
-      required: [['CSIS 2260']],
-    },
-    {
-      courseId: 'CSIS 3275',
-      title: 'Software Engineering',
-      credit: 3,
-      required: [
-        ['CSIS 2200', 'CSIS 1275'],
-        ['CSIS 2200', 'CSIS 2175'],
-      ],
-    },
-    {
-      courseId: 'CSIS 3270',
-      title: 'Advanced Networking',
-      credit: 3,
-      required: [['CSIS 2270']],
-    },
-  ];
+  private program = {};
+
+  private availableCourses = new BehaviorSubject<ICourse[]>(DEFAULT_COURSES);
+  private coursePrerequisite: CoursePrerequisite[] = COURSE_PREREQUISITES;
 
   constructor() {}
 
@@ -186,8 +88,8 @@ export class CourseService {
     const allAvailableCourse = this.coursePrerequisite
       .filter(
         (reqCourse) =>
-          reqCourse.required?.length === 0 ||
-          reqCourse.required?.some((set) =>
+          reqCourse.prerequisites?.length === 0 ||
+          reqCourse.prerequisites?.some((set) =>
             set.every((courseId) =>
               tookCourse.find((took) => took.courseId === courseId)
             )
