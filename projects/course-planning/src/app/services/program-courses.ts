@@ -7,36 +7,42 @@ export const DEFAULT_COURSES: ICourse[] = [
     courseId: 'CSIS 1175',
     course_code: 'CSIS 1175',
     title: 'Introduction to Programming I',
+    prerequisites: [],
     credit: 3,
   },
   {
     courseId: 'CSIS 1275',
     course_code: 'CSIS 1275',
     title: 'Introduction to Programming II',
+    prerequisites: [],
     credit: 3,
   },
   {
     courseId: 'CSIS 2175',
     course_code: 'CSIS 2175',
     title: 'Adv Integrated Software Dev',
+    prerequisites: [],
     credit: 3,
   },
   {
     courseId: 'CSIS 2200',
     course_code: 'CSIS 2200',
     title: 'Systems Analysis and Design',
+    prerequisites: [],
     credit: 3,
   },
   {
     courseId: 'CSIS 2260',
     course_code: 'CSIS 2260',
     title: 'Operating Systems',
+    prerequisites: [],
     credit: 3,
   },
   {
     courseId: 'CSIS 2270',
     course_code: 'CSIS 2270',
     title: 'Virtualization and Computer Networking',
+    prerequisites: [],
     credit: 3,
   },
 ];
@@ -44,66 +50,77 @@ export const DEFAULT_COURSES: ICourse[] = [
 export const COURSE_PREREQUISITES: CoursePrerequisite[] = [
   {
     courseId: 'CSIS 1175',
+    course_code: 'CSIS 1175',
     title: 'Introduction to Programming I',
     credit: 3,
     prerequisites: [],
   },
   {
     courseId: 'CSIS 1275',
+    course_code: 'CSIS 1275',
     title: 'Introduction to Programming II',
     credit: 3,
     prerequisites: [],
   },
   {
     courseId: 'CSIS 2175',
+    course_code: 'CSIS 2175',
     title: 'Adv Integrated Software Dev',
     credit: 3,
     prerequisites: [],
   },
   {
     courseId: 'CSIS 2200',
+    course_code: 'CSIS 2200',
     title: 'Systems Analysis and Design',
     credit: 3,
     prerequisites: [],
   },
   {
     courseId: 'CSIS 2260',
+    course_code: 'CSIS 2260',
     title: 'Operating Systems',
     credit: 3,
     prerequisites: [],
   },
   {
     courseId: 'CSIS 2270',
+    course_code: 'CSIS 2270',
     title: 'Virtualization and Computer Networking',
     credit: 3,
     prerequisites: [],
   },
   {
     courseId: 'CSIS 2300',
+    course_code: 'CSIS 2300',
     title: 'Database I',
     credit: 3,
     prerequisites: [['CSIS 2200']],
   },
   {
     courseId: 'CSIS 3155',
+    course_code: 'CSIS 3155',
     title: 'Computer Network Security',
     credit: 3,
     prerequisites: [['CSIS 2260'], ['CSIS 2270']],
   },
   {
     courseId: 'CSIS 3175',
+    course_code: 'CSIS 3175',
     title: 'Mobile Application Development I',
     credit: 3,
     prerequisites: [['CSIS 1275'], ['CSIS 2175']],
   },
   {
     courseId: 'CSIS 3160',
+    course_code: 'CSIS 3160',
     title: 'Evidence Imaging',
     credit: 3,
     prerequisites: [['CSIS 2260']],
   },
   {
     courseId: 'CSIS 3275',
+    course_code: 'CSIS 3275',
     title: 'Software Engineering',
     credit: 3,
     prerequisites: [
@@ -113,6 +130,7 @@ export const COURSE_PREREQUISITES: CoursePrerequisite[] = [
   },
   {
     courseId: 'CSIS 3270',
+    course_code: 'CSIS 3270',
     title: 'Advanced Networking',
     credit: 3,
     prerequisites: [['CSIS 2270']],
@@ -514,6 +532,7 @@ export const PROGRAM: IProgram = {
         [
           {
             url: '/course/mark-3235',
+            course_code: 'MARK 3235',
             title: 'E-Marketing',
             credit: '3.00',
             prerequisites: [['MARK 1120']],
@@ -542,6 +561,7 @@ export const PROGRAM: IProgram = {
         [
           {
             url: '/course/mark-4360',
+            course_code: 'MARK 4360',
             title: 'Customer Relationship Management',
             credit: '3.00',
             prerequisites: [
