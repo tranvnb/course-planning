@@ -57,7 +57,7 @@ export class CourseService {
   //   },
   // };
 
-  // private progress?: BehaviorSubject<Progress>;
+  private progress = new BehaviorSubject<Progress>({});
   private progressPoint = new BehaviorSubject<ProgressPoint | number>({
     stream: Stream.TECH,
     total: 0,
@@ -121,10 +121,10 @@ export class CourseService {
             acc[val.stream].completedCredit += val.completed;
             return acc;
           }
-        })
-        // tap((c) => console.log('pass to progress point: ', c))
+        }),
+        tap((c: Progress) => console.table(c))
       )
-      .subscribe((c) => console.log('pass to progress point: ', c));
+      .subscribe(() => {});
 
     this.semesterList.subscribe(() => {
       this.computeAvailableCourses();
@@ -137,19 +137,7 @@ export class CourseService {
   }
 
   getProgramProgress(): Observable<Progress> {
-    return this.progressPoint.pipe(
-      // accumulate the progress
-      scan((acc: Progress, val: ProgressPoint | number) => {
-        if (typeof val === 'number') {
-          return {};
-        } else {
-          acc[val.stream].totalCredit += val.total;
-          acc[val.stream].completedCredit += val.completed;
-          return acc;
-        }
-      })
-      // tap((c) => console.log(c))
-    );
+    return this.progress.asObservable();
   }
 
   getTodoCourses(): Observable<ICourse[]> {
@@ -220,12 +208,12 @@ export class CourseService {
   processRoadMapUnit(
     tookCourses: ICourse[],
     roadUnit: ICourse | ICourse[] | ICourse[][]
-  ) {
+  ): void {
     // road unit is an option
     if (roadUnit instanceof Array) {
-      let roadUnitCompletedCourses: number = 0;
-      let roadUnitTotalCourses: number = 0;
-      let roadUnitCompletedPercent: number = 0;
+      // let roadUnitCompletedCourses: number = 0;
+      // let roadUnitTotalCourses: number = 0;
+      // let roadUnitCompletedPercent: number = 0;
       roadUnit.forEach((path) => {
         // path includes a number of courses
         if (path instanceof Array) {
@@ -236,11 +224,11 @@ export class CourseService {
           if (doneCourses.length > 0) {
             this.setOfCourses.next(doneCourses);
             // compare and get the highest percentage of complete courses on path
-            if (roadUnitCompletedPercent < doneCourses.length / path.length) {
-              roadUnitCompletedPercent = doneCourses.length / path.length;
-              roadUnitCompletedCourses = doneCourses.length;
-              roadUnitTotalCourses = path.length;
-            }
+            // if (roadUnitCompletedPercent < doneCourses.length / path.length) {
+            //   roadUnitCompletedPercent = doneCourses.length / path.length;
+            //   roadUnitCompletedCourses = doneCourses.length;
+            //   roadUnitTotalCourses = path.length;
+            // }
           }
         }
         // path is just 1 course
@@ -251,23 +239,23 @@ export class CourseService {
           );
           if (doneCourses.length > 0) {
             this.setOfCourses.next(doneCourses);
-            this.progressPoint.next({
-              stream: Stream.TECH,
-              total: 1,
-              completed: 1,
-            });
+            // this.progressPoint.next({
+            //   stream: Stream.TECH,
+            //   total: 1,
+            //   completed: 1,
+            // });
           }
         }
       });
 
       // after calculate the percentage and the number of completed courses on each road unit
-      if (roadUnitCompletedCourses > 0) {
-        this.progressPoint.next({
-          stream: Stream.TECH,
-          total: roadUnitTotalCourses,
-          completed: roadUnitCompletedCourses,
-        });
-      }
+      // if (roadUnitCompletedCourses > 0) {
+      //   this.progressPoint.next({
+      //     stream: Stream.TECH,
+      //     total: roadUnitTotalCourses,
+      //     completed: roadUnitCompletedCourses,
+      //   });
+      // }
     }
     // road unit is a course
     else {
@@ -277,11 +265,11 @@ export class CourseService {
       );
       if (doneCourses.length > 0) {
         this.setOfCourses.next(doneCourses);
-        this.progressPoint.next({
-          stream: Stream.TECH,
-          total: 1,
-          completed: 1,
-        });
+        // this.progressPoint.next({
+        //   stream: Stream.TECH,
+        //   total: 1,
+        //   completed: 1,
+        // });
       }
     }
   }
@@ -330,18 +318,20 @@ export class CourseService {
         }
         // path is just 1 course
         else {
-          this.findPointOfRoadUnit(stream, tookCourses, path);
+          roadUnitTotalCourses = 1;
+          // this.findPointOfRoadUnit(stream, tookCourses, path);
+          if (tookCourses.some((c) => c.course_code === path.course_code)) {
+            //never use else case because I want to take the biggest percentage. so 1 is the one
+            roadUnitCompletedCourses = 1;
+          }
         }
       });
-
       // after calculate the percentage and the number of completed courses on each road unit
-      if (roadUnitCompletedCourses > 0) {
-        this.progressPoint.next({
-          stream: stream,
-          total: roadUnitTotalCourses,
-          completed: roadUnitCompletedCourses,
-        });
-      }
+      this.progressPoint.next({
+        stream: stream,
+        total: roadUnitTotalCourses,
+        completed: roadUnitCompletedCourses,
+      });
     }
     // road unit is a course
     else {
