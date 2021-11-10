@@ -60,7 +60,7 @@ export class CourseService {
   // private progress?: BehaviorSubject<Progress>;
   private progressPoint = new BehaviorSubject<ProgressPoint | number>({
     stream: Stream.TECH,
-    total: 100,
+    total: 0,
     completed: 0,
   });
 
@@ -125,7 +125,11 @@ export class CourseService {
         // tap((c) => console.log('pass to progress point: ', c))
       )
       .subscribe((c) => console.log('pass to progress point: ', c));
-    this.semesterList.subscribe(() => this.computeAvailableCourses());
+
+    this.semesterList.subscribe(() => {
+      this.computeAvailableCourses();
+      this.computeRoadMapPercentage();
+    });
   }
 
   getAvailableCourses(): Observable<ICourse[]> {
@@ -189,10 +193,8 @@ export class CourseService {
     console.log('Remove course ', course, 'to semester ', semester);
   }
 
-  private computeAvailableCourses(): void {
+  computeAvailableCourses(): void {
     this.setOfCourses.next([]);
-    this.progressPoint.next(0);
-
     const values: ISemester[] = this.semesterList.getValue();
     // values[length] is the current working semester
     const tookCourses = values
@@ -200,71 +202,9 @@ export class CourseService {
       .flatMap((sem) => sem.courses);
 
     // compute the available courses and create progress value for each program
-    this.program.first_year.forEach((roadUnit) => {
-      // road unit is an option
-      if (roadUnit instanceof Array) {
-        let roadUnitCompletedCourses: number = 0;
-        let roadUnitTotalCourses: number = 0;
-        let roadUnitCompletedPercent: number = 0;
-        roadUnit.forEach((path) => {
-          // path includes a number of courses
-          if (path instanceof Array) {
-            const doneCourses: ICourse[] = this.sastifiedPrerequisites(
-              tookCourses,
-              path
-            );
-            if (doneCourses.length > 0) {
-              this.setOfCourses.next(doneCourses);
-              // compare and get the highest percentage of complete courses on path
-              if (roadUnitCompletedPercent < doneCourses.length / path.length) {
-                roadUnitCompletedPercent = doneCourses.length / path.length;
-                roadUnitCompletedCourses = doneCourses.length;
-                roadUnitTotalCourses = path.length;
-              }
-            }
-          }
-          // path is just 1 course
-          else {
-            const doneCourses: ICourse[] = this.sastifiedPrerequisites(
-              tookCourses,
-              path
-            );
-            if (doneCourses.length > 0) {
-              this.setOfCourses.next(doneCourses);
-              this.progressPoint.next({
-                stream: Stream.TECH,
-                total: 1,
-                completed: 1,
-              });
-            }
-          }
-        });
-
-        // after calculate the percentage and the number of completed courses on each road unit
-        if (roadUnitCompletedCourses > 0) {
-          this.progressPoint.next({
-            stream: Stream.TECH,
-            total: roadUnitTotalCourses,
-            completed: roadUnitCompletedCourses,
-          });
-        }
-      }
-      // road unit is a course
-      else {
-        const doneCourses: ICourse[] = this.sastifiedPrerequisites(
-          tookCourses,
-          roadUnit
-        );
-        if (doneCourses.length > 0) {
-          this.setOfCourses.next(doneCourses);
-          this.progressPoint.next({
-            stream: Stream.TECH,
-            total: 1,
-            completed: 1,
-          });
-        }
-      }
-    });
+    this.program.first_year.forEach((roadUnit) =>
+      this.processRoadMapUnit(tookCourses, roadUnit)
+    );
 
     // then filter with current took course and current working semester
     const workingSemester = values[values.length - 1]?.courses;
@@ -277,7 +217,153 @@ export class CourseService {
     );
   }
 
-  private sastifiedPrerequisites(
+  processRoadMapUnit(
+    tookCourses: ICourse[],
+    roadUnit: ICourse | ICourse[] | ICourse[][]
+  ) {
+    // road unit is an option
+    if (roadUnit instanceof Array) {
+      let roadUnitCompletedCourses: number = 0;
+      let roadUnitTotalCourses: number = 0;
+      let roadUnitCompletedPercent: number = 0;
+      roadUnit.forEach((path) => {
+        // path includes a number of courses
+        if (path instanceof Array) {
+          const doneCourses: ICourse[] = this.findSastifiedPrerequisitesCourses(
+            tookCourses,
+            path
+          );
+          if (doneCourses.length > 0) {
+            this.setOfCourses.next(doneCourses);
+            // compare and get the highest percentage of complete courses on path
+            if (roadUnitCompletedPercent < doneCourses.length / path.length) {
+              roadUnitCompletedPercent = doneCourses.length / path.length;
+              roadUnitCompletedCourses = doneCourses.length;
+              roadUnitTotalCourses = path.length;
+            }
+          }
+        }
+        // path is just 1 course
+        else {
+          const doneCourses: ICourse[] = this.findSastifiedPrerequisitesCourses(
+            tookCourses,
+            path
+          );
+          if (doneCourses.length > 0) {
+            this.setOfCourses.next(doneCourses);
+            this.progressPoint.next({
+              stream: Stream.TECH,
+              total: 1,
+              completed: 1,
+            });
+          }
+        }
+      });
+
+      // after calculate the percentage and the number of completed courses on each road unit
+      if (roadUnitCompletedCourses > 0) {
+        this.progressPoint.next({
+          stream: Stream.TECH,
+          total: roadUnitTotalCourses,
+          completed: roadUnitCompletedCourses,
+        });
+      }
+    }
+    // road unit is a course
+    else {
+      const doneCourses: ICourse[] = this.findSastifiedPrerequisitesCourses(
+        tookCourses,
+        roadUnit
+      );
+      if (doneCourses.length > 0) {
+        this.setOfCourses.next(doneCourses);
+        this.progressPoint.next({
+          stream: Stream.TECH,
+          total: 1,
+          completed: 1,
+        });
+      }
+    }
+  }
+
+  computeRoadMapPercentage(): void {
+    const stream = Stream.TECH;
+
+    this.progressPoint.next(0);
+
+    const values: ISemester[] = this.semesterList.getValue();
+    // values[length] is the current working semester
+    const tookCourses = values
+      .slice(0, values.length - 1)
+      .flatMap((sem) => sem.courses);
+
+    // compute the available courses and create progress value for each program
+    this.program.first_year.forEach((roadUnit) =>
+      this.processRoadMapPercentage(stream, tookCourses, roadUnit)
+    );
+  }
+
+  processRoadMapPercentage(
+    stream: Stream,
+    tookCourses: ICourse[],
+    roadUnit: ICourse | ICourse[] | ICourse[][]
+  ) {
+    // road unit is an option
+    if (roadUnit instanceof Array) {
+      let roadUnitCompletedCourses: number = 0;
+      let roadUnitTotalCourses: number = 0;
+      let roadUnitCompletedPercent: number = 0;
+      roadUnit.forEach((path) => {
+        // path includes a number of courses
+        if (path instanceof Array) {
+          const doneCourses = path.filter((p) =>
+            tookCourses.some((t) => t.course_code === p.course_code)
+          );
+          if (doneCourses.length > 0) {
+            // compare and get the highest percentage of complete courses on path
+            if (roadUnitCompletedPercent < doneCourses.length / path.length) {
+              roadUnitCompletedPercent = doneCourses.length / path.length;
+              roadUnitCompletedCourses = doneCourses.length;
+              roadUnitTotalCourses = path.length;
+            }
+          }
+        }
+        // path is just 1 course
+        else {
+          this.findPointOfRoadUnit(stream, tookCourses, path);
+        }
+      });
+
+      // after calculate the percentage and the number of completed courses on each road unit
+      if (roadUnitCompletedCourses > 0) {
+        this.progressPoint.next({
+          stream: stream,
+          total: roadUnitTotalCourses,
+          completed: roadUnitCompletedCourses,
+        });
+      }
+    }
+    // road unit is a course
+    else {
+      this.findPointOfRoadUnit(stream, tookCourses, roadUnit);
+    }
+  }
+
+  findPointOfRoadUnit(steam: Stream, tookCourses: ICourse[], unit: ICourse) {
+    const point = {
+      stream: Stream.TECH,
+      total: 1,
+      completed: 1,
+    };
+    if (tookCourses.some((c) => c.course_code === unit.course_code)) {
+      point.completed = 1;
+    } else {
+      point.completed = 0;
+    }
+    this.progressPoint.next(point);
+  }
+
+  findSastifiedPrerequisitesCourses(
     tookCourses: ICourse[],
     unit: ICourse | ICourse[]
   ): ICourse[] {
