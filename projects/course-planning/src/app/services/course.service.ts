@@ -1,9 +1,27 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { scan } from 'rxjs/operators';
 import { ICourse } from '../interfaces/ICourse';
 import { ISemester } from '../interfaces/ISemester';
 import { CoursePrerequisite } from '../interfaces/CoursePrerequisites';
-import { DEFAULT_COURSES, COURSE_PREREQUISITES } from './program-courses';
+import {
+  DEFAULT_COURSES,
+  COURSE_PREREQUISITES,
+  PROGRAM,
+} from './program-courses';
+import { IProgram } from '../interfaces/IProgram';
+import { Stream, IStream } from '../interfaces/IStream';
+
+// type FinishPoint = { point: number; completed: number };
+type ProgressPoint = {
+  stream: string;
+  total: number;
+  completed: number;
+};
+
+type Progress = {
+  [keys: string]: IStream;
+};
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +37,48 @@ export class CourseService {
     // {id: 0, title: "Semester 1", courses: [{ title: 'CSIS 1175' }]}
   ]);
 
-  private program = {};
+  // private progresses = {
+  //   security: { name: Stream.SECURITY, totalCredit: 80, completedCredit: 0 },
+  //   database: { name: Stream.DATA, totalCredit: 80, completedCredit: 0 },
+  //   tech: {
+  //     name: Stream.TECH,
+  //     totalCredit: 80,
+  //     completedCredit: 0,
+  //   },
+  // };
+
+  // private progess: Progress = {
+  //   security: { name: Stream.SECURITY, totalCredit: 80, completedCredit: 0 },
+  //   database: { name: Stream.DATA, totalCredit: 80, completedCredit: 0 },
+  //   tech: {
+  //     name: Stream.TECH,
+  //     totalCredit: 80,
+  //     completedCredit: 0,
+  //   },
+  // };
+
+  // private progress?: BehaviorSubject<Progress>;
+  private progressPoint = new BehaviorSubject<ProgressPoint>({
+    stream: Stream.TECH,
+    total: 100,
+    completed: 0,
+  });
+
+  // =
+  //   new BehaviorSubject<ProgressPoint>({
+  //     stream: Stream.TECH,
+  //     total: 100,
+  //     completed: 0,
+  //   }).pipe(
+  //     // accumulate the progress
+  //     scan((acc: Progress, val: ProgressPoint) => {
+  //       acc[val.stream].totalCredit += val.total;
+  //       acc[val.stream].completedCredit += val.completed;
+  //       return acc;
+  //     })
+  //   );
+
+  private program: IProgram = PROGRAM;
 
   private availableCourses = new BehaviorSubject<ICourse[]>(DEFAULT_COURSES);
   private coursePrerequisite: CoursePrerequisite[] = COURSE_PREREQUISITES;
@@ -28,6 +87,17 @@ export class CourseService {
 
   getAvailableCourses(): Observable<ICourse[]> {
     return this.availableCourses.asObservable();
+  }
+
+  getProgramProgress(): Observable<Progress> {
+    return this.progressPoint.pipe(
+      // accumulate the progress
+      scan((acc: Progress, val: ProgressPoint) => {
+        acc[val.stream].totalCredit += val.total;
+        acc[val.stream].completedCredit += val.completed;
+        return acc;
+      })
+    );
   }
 
   getTodoCourses(): Observable<ICourse[]> {
@@ -112,5 +182,111 @@ export class CourseService {
           !workingSemester.find((w) => w.courseId === c.courseId)
       )
     );
+  }
+
+  private computeAvailableCourses(): void {
+    const values: ISemester[] = this.semesterList.getValue();
+    // values[length] is the current working semester
+    const tookCourses = values
+      .slice(0, values.length - 1)
+      .flatMap((sem) => sem.courses);
+
+    // compute the available courses and create progress value for each program
+    this.program.first_year.forEach((roadUnit) => {
+      // road unit is an option
+      if (roadUnit instanceof Array) {
+        let roadUnitCompletedCourses: number = 0;
+        let roadUnitTotalCourses: number = 0;
+        let roadUnitCompletedPercent: number = 0;
+        roadUnit.forEach((path) => {
+          // path includes a number of courses
+          if (path instanceof Array) {
+            const doneCourses: ICourse[] = this.sastifiedPrerequisites(
+              tookCourses,
+              path
+            );
+            if (doneCourses.length > 0) {
+              this.availableCourses.next(doneCourses);
+              // compare and get the highest percentage of complete courses on path
+              if (roadUnitCompletedPercent < doneCourses.length / path.length) {
+                roadUnitCompletedPercent = doneCourses.length / path.length;
+                roadUnitCompletedCourses = doneCourses.length;
+                roadUnitTotalCourses = path.length;
+              }
+            }
+          }
+          // path is just 1 course
+          else {
+            const doneCourses: ICourse[] = this.sastifiedPrerequisites(
+              tookCourses,
+              path
+            );
+            if (doneCourses.length > 0) {
+              this.availableCourses.next(doneCourses);
+              this.progressPoint.next({
+                stream: Stream.TECH,
+                total: 1,
+                completed: 1,
+              });
+            }
+          }
+        });
+
+        // after calculate the percentage and the number of completed courses on each road unit
+        if (roadUnitCompletedCourses > 0) {
+          this.progressPoint.next({
+            stream: Stream.TECH,
+            total: roadUnitTotalCourses,
+            completed: roadUnitCompletedCourses,
+          });
+        }
+      }
+      // road unit is a course
+      else {
+        const doneCourses: ICourse[] = this.sastifiedPrerequisites(
+          tookCourses,
+          roadUnit
+        );
+        this.availableCourses.next(doneCourses);
+        this.progressPoint.next({
+          stream: Stream.TECH,
+          total: 1,
+          completed: 1,
+        });
+      }
+    });
+  }
+
+  private sastifiedPrerequisites(
+    tookCourses: ICourse[],
+    unit: ICourse | ICourse[]
+  ): ICourse[] {
+    if (unit instanceof Array) {
+      unit.reduce((acc: ICourse[], val): ICourse[] => {
+        const sastified = val.prerequisites.some(
+          (reqSet) =>
+            reqSet.length === 0 ||
+            reqSet.every((code) =>
+              tookCourses.find((took) => took.courseId === code)
+            )
+        );
+        if (sastified) {
+          acc.push(val);
+        }
+        return acc;
+      }, []);
+    } else {
+      const sastified = unit.prerequisites.some(
+        (reqSet) =>
+          reqSet.length === 0 ||
+          reqSet.every((code) =>
+            tookCourses.find((took) => took.courseId === code)
+          )
+      );
+      if (sastified) {
+        return [unit];
+      }
+    }
+    return [];
   }
 }
