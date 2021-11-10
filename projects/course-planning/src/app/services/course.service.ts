@@ -14,7 +14,7 @@ import { Stream, IStream } from '../interfaces/IStream';
 
 // type FinishPoint = { point: number; completed: number };
 type ProgressPoint = {
-  stream: string;
+  stream: Stream;
   total: number;
   completed: number;
 };
@@ -58,7 +58,7 @@ export class CourseService {
   // };
 
   // private progress?: BehaviorSubject<Progress>;
-  private progressPoint = new BehaviorSubject<ProgressPoint>({
+  private progressPoint = new BehaviorSubject<ProgressPoint | number>({
     stream: Stream.TECH,
     total: 100,
     completed: 0,
@@ -82,14 +82,6 @@ export class CourseService {
 
   private availableCourses = new BehaviorSubject<ICourse[]>([]);
   private setOfCourses = new BehaviorSubject<ICourse[]>([]);
-  // .pipe(
-  //   scan((acc: ICourse[], val: ICourse[]) => {
-  //     acc.push(
-  //       ...val.filter((v) => acc.every((a) => a.course_code !== v.course_code))
-  //     );
-  //     return acc;
-  //   })
-  // );
 
   private coursePrerequisite: CoursePrerequisite[] = COURSE_PREREQUISITES;
 
@@ -110,6 +102,29 @@ export class CourseService {
         })
       )
       .subscribe((c) => this.availableCourses.next(c));
+
+    this.progressPoint
+      .pipe(
+        // accumulate the progress
+        scan((acc: Progress, val: ProgressPoint | number) => {
+          if (typeof val === 'number') {
+            return {};
+          } else {
+            if (acc[val.stream] === undefined) {
+              acc[val.stream] = {
+                name: val.stream,
+                totalCredit: 0,
+                completedCredit: 0,
+              };
+            }
+            acc[val.stream].totalCredit += val.total;
+            acc[val.stream].completedCredit += val.completed;
+            return acc;
+          }
+        })
+        // tap((c) => console.log('pass to progress point: ', c))
+      )
+      .subscribe((c) => console.log('pass to progress point: ', c));
     this.semesterList.subscribe(() => this.computeAvailableCourses());
   }
 
@@ -120,10 +135,14 @@ export class CourseService {
   getProgramProgress(): Observable<Progress> {
     return this.progressPoint.pipe(
       // accumulate the progress
-      scan((acc: Progress, val: ProgressPoint) => {
-        acc[val.stream].totalCredit += val.total;
-        acc[val.stream].completedCredit += val.completed;
-        return acc;
+      scan((acc: Progress, val: ProgressPoint | number) => {
+        if (typeof val === 'number') {
+          return {};
+        } else {
+          acc[val.stream].totalCredit += val.total;
+          acc[val.stream].completedCredit += val.completed;
+          return acc;
+        }
       })
       // tap((c) => console.log(c))
     );
@@ -170,44 +189,9 @@ export class CourseService {
     console.log('Remove course ', course, 'to semester ', semester);
   }
 
-  private updateAvailableCourses() {
-    const values: ISemester[] = this.semesterList.getValue();
-    const tookCourse = values
-      .slice(0, values.length - 1)
-      .flatMap((sem) => sem.courses);
-
-    // get all available courses base on took courses
-    const allAvailableCourse = this.coursePrerequisite
-      .filter(
-        (reqCourse) =>
-          reqCourse.prerequisites?.length === 0 ||
-          reqCourse.prerequisites?.some((set) =>
-            set.every((courseId) =>
-              tookCourse.find((took) => took.courseId === courseId)
-            )
-          )
-      )
-      .map(
-        (result) =>
-          <ICourse>{
-            courseId: result.courseId,
-            title: result.title,
-            credit: result.credit,
-          }
-      );
-    // then filter with current took course and current working semester
-    const workingSemester = values[values.length - 1]?.courses;
-    this.availableCourses.next(
-      allAvailableCourse.filter(
-        (c) =>
-          !tookCourse.find((t) => t.courseId === c.courseId) &&
-          !workingSemester?.find((w) => w.courseId === c.courseId)
-      )
-    );
-  }
-
   private computeAvailableCourses(): void {
     this.setOfCourses.next([]);
+    this.progressPoint.next(0);
 
     const values: ISemester[] = this.semesterList.getValue();
     // values[length] is the current working semester

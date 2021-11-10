@@ -1,11 +1,11 @@
 export enum Stream {
-  TECH = 'emmerge technologies',
+  TECH = 'tech',
   DATA = 'database',
   SECURITY = 'security',
 }
 
 export interface IStream {
   name: Stream;
-  totalCredit: 80;
-  completedCredit: 0;
+  totalCredit: number;
+  completedCredit: number;
 }
