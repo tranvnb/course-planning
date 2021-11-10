@@ -561,7 +561,7 @@ export const PROGRAM: IProgram = {
         [
           {
             url: '/course/mark-4360',
-            course_code: 'MARK 4360',
+            course_code: 'CSIS 4360',
             title: 'Customer Relationship Management',
             credit: '3.00',
             prerequisites: [
