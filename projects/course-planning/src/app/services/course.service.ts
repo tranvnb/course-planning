@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { scan } from 'rxjs/operators';
+import { scan, tap } from 'rxjs/operators';
 import { ICourse } from '../interfaces/ICourse';
 import { ISemester } from '../interfaces/ISemester';
 import { CoursePrerequisite } from '../interfaces/CoursePrerequisites';
@@ -80,10 +80,38 @@ export class CourseService {
 
   private program: IProgram = PROGRAM;
 
-  private availableCourses = new BehaviorSubject<ICourse[]>(DEFAULT_COURSES);
+  private availableCourses = new BehaviorSubject<ICourse[]>([]);
+  private setOfCourses = new BehaviorSubject<ICourse[]>([]);
+  // .pipe(
+  //   scan((acc: ICourse[], val: ICourse[]) => {
+  //     acc.push(
+  //       ...val.filter((v) => acc.every((a) => a.course_code !== v.course_code))
+  //     );
+  //     return acc;
+  //   })
+  // );
+
   private coursePrerequisite: CoursePrerequisite[] = COURSE_PREREQUISITES;
 
-  constructor() {}
+  constructor() {
+    this.setOfCourses
+      .pipe(
+        scan((acc: ICourse[], val: ICourse[]) => {
+          if (val.length > 0) {
+            acc.push(
+              ...val.filter((v) =>
+                acc.every((a) => a.course_code !== v.course_code)
+              )
+            );
+          } else {
+            acc = [];
+          }
+          return acc;
+        })
+      )
+      .subscribe((c) => this.availableCourses.next(c));
+    this.semesterList.subscribe(() => this.computeAvailableCourses());
+  }
 
   getAvailableCourses(): Observable<ICourse[]> {
     return this.availableCourses.asObservable();
@@ -97,6 +125,7 @@ export class CourseService {
         acc[val.stream].completedCredit += val.completed;
         return acc;
       })
+      // tap((c) => console.log(c))
     );
   }
 
@@ -115,15 +144,9 @@ export class CourseService {
   }
 
   deleteSemester(semester: ISemester): void {
-    // return courses to the available list
-    this.availableCourses.next([
-      ...this.availableCourses.getValue(),
-      ...semester.courses,
-    ]);
     this.semesterList.next(
       this.semesterList.value.filter((s) => s.id !== semester.id)
     );
-    this.updateAvailableCourses();
   }
 
   addSemester(): void {
@@ -136,7 +159,6 @@ export class CourseService {
         courses: [],
       },
     ]);
-    this.updateAvailableCourses();
   }
 
   addCourseToSemester(course: ICourse, semester: ISemester): void {
@@ -179,12 +201,14 @@ export class CourseService {
       allAvailableCourse.filter(
         (c) =>
           !tookCourse.find((t) => t.courseId === c.courseId) &&
-          !workingSemester.find((w) => w.courseId === c.courseId)
+          !workingSemester?.find((w) => w.courseId === c.courseId)
       )
     );
   }
 
   private computeAvailableCourses(): void {
+    this.setOfCourses.next([]);
+
     const values: ISemester[] = this.semesterList.getValue();
     // values[length] is the current working semester
     const tookCourses = values
@@ -206,7 +230,7 @@ export class CourseService {
               path
             );
             if (doneCourses.length > 0) {
-              this.availableCourses.next(doneCourses);
+              this.setOfCourses.next(doneCourses);
               // compare and get the highest percentage of complete courses on path
               if (roadUnitCompletedPercent < doneCourses.length / path.length) {
                 roadUnitCompletedPercent = doneCourses.length / path.length;
@@ -222,7 +246,7 @@ export class CourseService {
               path
             );
             if (doneCourses.length > 0) {
-              this.availableCourses.next(doneCourses);
+              this.setOfCourses.next(doneCourses);
               this.progressPoint.next({
                 stream: Stream.TECH,
                 total: 1,
@@ -247,14 +271,26 @@ export class CourseService {
           tookCourses,
           roadUnit
         );
-        this.availableCourses.next(doneCourses);
-        this.progressPoint.next({
-          stream: Stream.TECH,
-          total: 1,
-          completed: 1,
-        });
+        if (doneCourses.length > 0) {
+          this.setOfCourses.next(doneCourses);
+          this.progressPoint.next({
+            stream: Stream.TECH,
+            total: 1,
+            completed: 1,
+          });
+        }
       }
     });
+
+    // then filter with current took course and current working semester
+    const workingSemester = values[values.length - 1]?.courses;
+    this.availableCourses.next(
+      this.availableCourses.value.filter(
+        (c) =>
+          !tookCourses.find((t) => t.course_code === c.course_code) &&
+          !workingSemester?.find((w) => w.course_code === c.course_code)
+      )
+    );
   }
 
   private sastifiedPrerequisites(
@@ -262,27 +298,29 @@ export class CourseService {
     unit: ICourse | ICourse[]
   ): ICourse[] {
     if (unit instanceof Array) {
-      unit.reduce((acc: ICourse[], val): ICourse[] => {
-        const sastified = val.prerequisites.some(
-          (reqSet) =>
-            reqSet.length === 0 ||
-            reqSet.every((code) =>
-              tookCourses.find((took) => took.courseId === code)
-            )
-        );
+      return unit.reduce((acc: ICourse[], val): ICourse[] => {
+        const sastified =
+          val.prerequisites.some(
+            (reqSet) =>
+              reqSet.length === 0 ||
+              reqSet.every((code) =>
+                tookCourses.find((took) => took.course_code === code)
+              )
+          ) || val.prerequisites.some((e) => e.includes('PBDCIS'));
         if (sastified) {
           acc.push(val);
         }
         return acc;
       }, []);
     } else {
-      const sastified = unit.prerequisites.some(
-        (reqSet) =>
-          reqSet.length === 0 ||
-          reqSet.every((code) =>
-            tookCourses.find((took) => took.courseId === code)
-          )
-      );
+      const sastified =
+        unit.prerequisites.some(
+          (reqSet) =>
+            reqSet.length === 0 ||
+            reqSet.every((code) =>
+              tookCourses.find((took) => took.course_code === code)
+            )
+        ) || unit.prerequisites.some((e) => e.includes('PBDCIS'));
       if (sastified) {
         return [unit];
       }
