@@ -33,7 +33,9 @@ export class PlanningBoardComponent implements OnInit {
   }
 
   getSemesters(): void {
-    this.courseService.getSemesters().subscribe(sem => this.semesterList=sem)
+    this.courseService
+      .getSemesters()
+      .subscribe((sem) => (this.semesterList = sem));
   }
 
   getTodoCourses(): void {
@@ -72,20 +74,26 @@ export class PlanningBoardComponent implements OnInit {
         event.currentIndex
       );
       // emit an event to notify the item changed
-      if (event.previousContainer.id === "available-courses") { // need inject token for this constant value
-        this.courseService.addCourseToSemester(event.container.data[event.currentIndex], this.semesterList[parseInt(event.container.id)])
+      if (event.previousContainer.id === 'available-courses') {
+        // need inject token for this constant value
+        this.courseService.addCourseToSemester(
+          event.container.data[event.currentIndex],
+          this.semesterList[parseInt(event.container.id)]
+        );
       } else {
-        this.courseService.removeCourseFromSemester(event.container.data[event.currentIndex], this.semesterList[parseInt(event.container.id)])
+        this.courseService.removeCourseFromSemester(
+          event.container.data[event.currentIndex],
+          this.semesterList[parseInt(event.container.id)]
+        );
       }
-      // console.log(event.container.data[event.currentIndex])
     }
   }
 
   addNewSemester(): void {
-    this.courseService.addSemester()
+    this.courseService.addSemester();
   }
 
   removeSemester(semester: ISemester): void {
-    this.courseService.deleteSemester(semester)
+    this.courseService.deleteSemester(semester);
   }
 }
