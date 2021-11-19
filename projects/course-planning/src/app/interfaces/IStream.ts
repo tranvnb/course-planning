@@ -1,6 +1,6 @@
 export enum Stream {
-  TECH = 'tech',
-  DATA = 'database',
+  TECH = 'emmerge_tech',
+  DATA = 'data_analysis',
   SECURITY = 'security',
 }
 

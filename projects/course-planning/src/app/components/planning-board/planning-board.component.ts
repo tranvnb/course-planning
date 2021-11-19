@@ -26,8 +26,7 @@ export class PlanningBoardComponent implements OnInit {
 
   ngOnInit(): void {
     console.debug('Dashboard init');
-    this.getDoneCourses();
-    this.getTodoCourses();
+    this.courseService.fetchAllData();
     this.getAvailableCourses();
     this.getSemesters();
   }
@@ -38,18 +37,6 @@ export class PlanningBoardComponent implements OnInit {
       .subscribe((sem) => (this.semesterList = sem));
   }
 
-  getTodoCourses(): void {
-    this.courseService
-      .getTodoCourses()
-      .subscribe((courses) => (this.todo = courses));
-  }
-
-  getDoneCourses(): void {
-    this.courseService
-      .getDoneCourses()
-      .subscribe((courses) => (this.done = courses));
-  }
-
   getAvailableCourses(): void {
     this.courseService
       .getAvailableCourses()
@@ -57,9 +44,6 @@ export class PlanningBoardComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<ICourse[]>) {
-    // https://blog.logrocket.com/angular-state-management-made-simple-with-ngrx/
-    // https://www.learnrxjs.io/learn-rxjs/subjects/behaviorsubject
-
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -74,18 +58,18 @@ export class PlanningBoardComponent implements OnInit {
         event.currentIndex
       );
       // emit an event to notify the item changed
-      if (event.previousContainer.id === 'available-courses') {
-        // need inject token for this constant value
-        this.courseService.addCourseToSemester(
-          event.container.data[event.currentIndex],
-          this.semesterList[parseInt(event.container.id)]
-        );
-      } else {
-        this.courseService.removeCourseFromSemester(
-          event.container.data[event.currentIndex],
-          this.semesterList[parseInt(event.container.id)]
-        );
-      }
+      // if (event.previousContainer.id === 'available-courses') {
+      //   // need inject token for this constant value
+      //   this.courseService.addCourseToSemester(
+      //     event.container.data[event.currentIndex],
+      //     this.semesterList[parseInt(event.container.id)]
+      //   );
+      // } else {
+      //   this.courseService.removeCourseFromSemester(
+      //     event.container.data[event.currentIndex],
+      //     this.semesterList[parseInt(event.container.id)]
+      //   );
+      // }
     }
   }
 

@@ -17,6 +17,18 @@
   & div {
     margin-bottom: 10px;
   }
+  .course-id {
+    .stream {
+      .mat-icon + .mat-icon {
+        margin-left: 3px;
+      }
+      display: inline-block;
+      position: relative;
+      right: -46px;
+      top: 5px;
+      margin-bottom: 0px;
+    }
+  }
   .course-title {
     font-size: 12px;
     font-weight: bold;

@@ -1,51 +1,51 @@
-import { ICourse } from '../interfaces/ICourse';
+// import { ICourse } from '../interfaces/ICourse';
 import { CoursePrerequisite } from '../interfaces/CoursePrerequisites';
 import { IProgram } from '../interfaces/IProgram';
 
-export const DEFAULT_COURSES: ICourse[] = [
-  {
-    courseId: 'CSIS 1175',
-    course_code: 'CSIS 1175',
-    title: 'Introduction to Programming I',
-    prerequisites: [],
-    credit: 3,
-  },
-  {
-    courseId: 'CSIS 1275',
-    course_code: 'CSIS 1275',
-    title: 'Introduction to Programming II',
-    prerequisites: [],
-    credit: 3,
-  },
-  {
-    courseId: 'CSIS 2175',
-    course_code: 'CSIS 2175',
-    title: 'Adv Integrated Software Dev',
-    prerequisites: [],
-    credit: 3,
-  },
-  {
-    courseId: 'CSIS 2200',
-    course_code: 'CSIS 2200',
-    title: 'Systems Analysis and Design',
-    prerequisites: [],
-    credit: 3,
-  },
-  {
-    courseId: 'CSIS 2260',
-    course_code: 'CSIS 2260',
-    title: 'Operating Systems',
-    prerequisites: [],
-    credit: 3,
-  },
-  {
-    courseId: 'CSIS 2270',
-    course_code: 'CSIS 2270',
-    title: 'Virtualization and Computer Networking',
-    prerequisites: [],
-    credit: 3,
-  },
-];
+// export const DEFAULT_COURSES: ICourse[] = [
+//   {
+//     courseId: 'CSIS 1175',
+//     course_code: 'CSIS 1175',
+//     title: 'Introduction to Programming I',
+//     prerequisites: [],
+//     credit: 3,
+//   },
+//   {
+//     courseId: 'CSIS 1275',
+//     course_code: 'CSIS 1275',
+//     title: 'Introduction to Programming II',
+//     prerequisites: [],
+//     credit: 3,
+//   },
+//   {
+//     courseId: 'CSIS 2175',
+//     course_code: 'CSIS 2175',
+//     title: 'Adv Integrated Software Dev',
+//     prerequisites: [],
+//     credit: 3,
+//   },
+//   {
+//     courseId: 'CSIS 2200',
+//     course_code: 'CSIS 2200',
+//     title: 'Systems Analysis and Design',
+//     prerequisites: [],
+//     credit: 3,
+//   },
+//   {
+//     courseId: 'CSIS 2260',
+//     course_code: 'CSIS 2260',
+//     title: 'Operating Systems',
+//     prerequisites: [],
+//     credit: 3,
+//   },
+//   {
+//     courseId: 'CSIS 2270',
+//     course_code: 'CSIS 2270',
+//     title: 'Virtualization and Computer Networking',
+//     prerequisites: [],
+//     credit: 3,
+//   },
+// ];
 
 export const COURSE_PREREQUISITES: CoursePrerequisite[] = [
   {

@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { scan, tap } from 'rxjs/operators';
+import { BehaviorSubject, EMPTY, from, Observable, of } from 'rxjs';
+import { filter, map, reduce, scan, tap } from 'rxjs/operators';
 import { ICourse } from '../interfaces/ICourse';
 import { ISemester } from '../interfaces/ISemester';
 import { CoursePrerequisite } from '../interfaces/CoursePrerequisites';
-import {
-  DEFAULT_COURSES,
-  COURSE_PREREQUISITES,
-  PROGRAM,
-} from './program-courses';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { COURSE_PREREQUISITES, PROGRAM } from './program-courses';
 import { IProgram } from '../interfaces/IProgram';
 import { Stream, IStream } from '../interfaces/IStream';
 
@@ -29,54 +27,14 @@ type Progress = {
 export class CourseService {
   private semesterCount: number = 1;
 
-  // private semesterList1: ISemester[] = [
-  //   {title: "Semester 1", courses: [{ title: 'CSIS 1175' },]}
-  // ]
-
-  private semesterList = new BehaviorSubject<ISemester[]>([
-    // {id: 0, title: "Semester 1", courses: [{ title: 'CSIS 1175' }]}
-  ]);
-
-  // private progresses = {
-  //   security: { name: Stream.SECURITY, totalCredit: 80, completedCredit: 0 },
-  //   database: { name: Stream.DATA, totalCredit: 80, completedCredit: 0 },
-  //   tech: {
-  //     name: Stream.TECH,
-  //     totalCredit: 80,
-  //     completedCredit: 0,
-  //   },
-  // };
-
-  // private progess: Progress = {
-  //   security: { name: Stream.SECURITY, totalCredit: 80, completedCredit: 0 },
-  //   database: { name: Stream.DATA, totalCredit: 80, completedCredit: 0 },
-  //   tech: {
-  //     name: Stream.TECH,
-  //     totalCredit: 80,
-  //     completedCredit: 0,
-  //   },
-  // };
+  private semesterList = new BehaviorSubject<ISemester[]>([]);
 
   private progress = new BehaviorSubject<Progress>({});
-  private progressPoint = new BehaviorSubject<ProgressPoint | number>({
+  private progressPoint = new BehaviorSubject<ProgressPoint>({
     stream: Stream.TECH,
     total: 0,
     completed: 0,
   });
-
-  // =
-  //   new BehaviorSubject<ProgressPoint>({
-  //     stream: Stream.TECH,
-  //     total: 100,
-  //     completed: 0,
-  //   }).pipe(
-  //     // accumulate the progress
-  //     scan((acc: Progress, val: ProgressPoint) => {
-  //       acc[val.stream].totalCredit += val.total;
-  //       acc[val.stream].completedCredit += val.completed;
-  //       return acc;
-  //     })
-  //   );
 
   private program: IProgram = PROGRAM;
 
@@ -85,51 +43,101 @@ export class CourseService {
 
   private coursePrerequisite: CoursePrerequisite[] = COURSE_PREREQUISITES;
 
-  constructor() {
-    this.setOfCourses
-      .pipe(
-        scan((acc: ICourse[], val: ICourse[]) => {
-          if (val.length > 0) {
-            acc.push(
-              ...val.filter((v) =>
-                acc.every((a) => a.course_code !== v.course_code)
-              )
-            );
-          } else {
-            acc = [];
-          }
-          return acc;
-        })
-      )
-      .subscribe((c) => this.availableCourses.next(c));
+  httpHeader = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+    }),
+  };
 
-    this.progressPoint
-      .pipe(
-        // accumulate the progress
-        scan((acc: Progress, val: ProgressPoint | number) => {
-          if (typeof val === 'number') {
-            return {};
-          } else {
-            if (acc[val.stream] === undefined) {
-              acc[val.stream] = {
-                name: val.stream,
-                totalCredit: 0,
-                completedCredit: 0,
-              };
-            }
-            acc[val.stream].totalCredit += val.total;
-            acc[val.stream].completedCredit += val.completed;
-            return acc;
-          }
-        }),
-        tap((c: Progress) => console.table(c))
-      )
-      .subscribe(() => {});
-
+  constructor(private http: HttpClient) {
     this.semesterList.subscribe(() => {
       this.computeAvailableCourses();
       this.computeRoadMapPercentage();
     });
+  }
+
+  fetchAllData(): Observable<any> {
+    return this.http
+      .get<any>(environment.API_URL + '/programs?code=PBDCIS')
+      .pipe(map((json) => (this.program = json.data)));
+  }
+
+  private resetAvailableCoursesList(): void {
+    this.setOfCourses = new BehaviorSubject<ICourse[]>([]);
+    this.setOfCourses
+      .pipe(
+        reduce((acc: ICourse[], val: ICourse[]) => {
+          // beauty of stream and events
+          const tempArr: ICourse[] = [];
+          from(val)
+            .pipe(
+              map((v) => {
+                const foundCourse = acc.find(
+                  (a) => a.course_code === v.course_code
+                );
+
+                // only merge streams if duplicated course and has new stream
+                if (foundCourse !== undefined) {
+                  // check the stream in order to merge
+                  const newStreams = foundCourse.streams?.filter(
+                    (mstr) => !v.streams?.includes(mstr)
+                  );
+
+                  if (newStreams === undefined || newStreams?.length <= 0) {
+                    return undefined;
+                  } else {
+                    v.streams?.push(...newStreams);
+                    return v;
+                  }
+                } else {
+                  return v;
+                }
+              })
+            )
+            .subscribe((v) => {
+              if (v !== undefined) {
+                tempArr.push(v);
+              }
+            });
+
+          acc.push(...tempArr);
+          // acc.push(
+          //   ...val.filter((v) =>
+          //     acc.every((a) => a.course_code !== v.course_code)
+          //   )
+          // );
+          return acc;
+        }),
+        tap((c) => console.log(c))
+      )
+      .subscribe((c) => this.availableCourses.next(c));
+  }
+
+  private resetRoadMapPercentage(): void {
+    this.progressPoint = new BehaviorSubject<ProgressPoint>({
+      stream: Stream.TECH,
+      total: 0,
+      completed: 0,
+    });
+
+    this.progressPoint
+      .pipe(
+        // accumulate the progress
+        reduce((acc: Progress, val: ProgressPoint) => {
+          if (acc[val.stream] === undefined) {
+            acc[val.stream] = {
+              name: val.stream,
+              totalCredit: 0,
+              completedCredit: 0,
+            };
+          }
+          acc[val.stream].totalCredit += val.total;
+          acc[val.stream].completedCredit += val.completed;
+          return acc;
+        }),
+        tap((c: Progress) => console.table(c))
+      )
+      .subscribe(() => {});
   }
 
   getAvailableCourses(): Observable<ICourse[]> {
@@ -138,16 +146,6 @@ export class CourseService {
 
   getProgramProgress(): Observable<Progress> {
     return this.progress.asObservable();
-  }
-
-  getTodoCourses(): Observable<ICourse[]> {
-    const todoCourses = of([]);
-    return todoCourses;
-  }
-
-  getDoneCourses(): Observable<ICourse[]> {
-    const doneCourses = of([]);
-    return doneCourses;
   }
 
   getSemesters(): Observable<ISemester[]> {
@@ -172,17 +170,10 @@ export class CourseService {
     ]);
   }
 
-  addCourseToSemester(course: ICourse, semester: ISemester): void {
-    console.log('Added course ', course, 'to semester ', semester);
-  }
+  private computeAvailableCourses(): void {
+    // this.setOfCourses.next([]);
+    this.resetAvailableCoursesList();
 
-  removeCourseFromSemester(course: ICourse, semester: ISemester): void {
-    // if (semester.courses.length === 0 && )
-    console.log('Remove course ', course, 'to semester ', semester);
-  }
-
-  computeAvailableCourses(): void {
-    this.setOfCourses.next([]);
     const values: ISemester[] = this.semesterList.getValue();
     // values[length] is the current working semester
     const tookCourses = values
@@ -191,8 +182,26 @@ export class CourseService {
 
     // compute the available courses and create progress value for each program
     this.program.first_year.forEach((roadUnit) =>
-      this.processRoadMapUnit(tookCourses, roadUnit)
+      this.processRoadMapUnit(tookCourses, roadUnit, [
+        Stream.TECH,
+        Stream.DATA,
+        Stream.SECURITY,
+      ])
     );
+
+    this.program.second_year[Stream.TECH].forEach((roadUnit) =>
+      this.processRoadMapUnit(tookCourses, roadUnit, [Stream.TECH])
+    );
+
+    this.program.second_year[Stream.DATA].forEach((roadUnit) =>
+      this.processRoadMapUnit(tookCourses, roadUnit, [Stream.DATA])
+    );
+
+    this.program.second_year[Stream.SECURITY].forEach((roadUnit) =>
+      this.processRoadMapUnit(tookCourses, roadUnit, [Stream.SECURITY])
+    );
+
+    this.setOfCourses.complete();
 
     // then filter with current took course and current working semester
     const workingSemester = values[values.length - 1]?.courses;
@@ -205,9 +214,10 @@ export class CourseService {
     );
   }
 
-  processRoadMapUnit(
+  private processRoadMapUnit(
     tookCourses: ICourse[],
-    roadUnit: ICourse | ICourse[] | ICourse[][]
+    roadUnit: ICourse | ICourse[] | ICourse[][],
+    streams: Stream[]
   ): void {
     // road unit is an option
     if (roadUnit instanceof Array) {
@@ -219,7 +229,8 @@ export class CourseService {
         if (path instanceof Array) {
           const doneCourses: ICourse[] = this.findSastifiedPrerequisitesCourses(
             tookCourses,
-            path
+            path,
+            streams
           );
           if (doneCourses.length > 0) {
             this.setOfCourses.next(doneCourses);
@@ -235,7 +246,8 @@ export class CourseService {
         else {
           const doneCourses: ICourse[] = this.findSastifiedPrerequisitesCourses(
             tookCourses,
-            path
+            path,
+            streams
           );
           if (doneCourses.length > 0) {
             this.setOfCourses.next(doneCourses);
@@ -261,23 +273,19 @@ export class CourseService {
     else {
       const doneCourses: ICourse[] = this.findSastifiedPrerequisitesCourses(
         tookCourses,
-        roadUnit
+        roadUnit,
+        streams
       );
       if (doneCourses.length > 0) {
         this.setOfCourses.next(doneCourses);
-        // this.progressPoint.next({
-        //   stream: Stream.TECH,
-        //   total: 1,
-        //   completed: 1,
-        // });
       }
     }
   }
 
-  computeRoadMapPercentage(): void {
+  private computeRoadMapPercentage(): void {
     const stream = Stream.TECH;
 
-    this.progressPoint.next(0);
+    this.resetRoadMapPercentage();
 
     const values: ISemester[] = this.semesterList.getValue();
     // values[length] is the current working semester
@@ -289,9 +297,15 @@ export class CourseService {
     this.program.first_year.forEach((roadUnit) =>
       this.processRoadMapPercentage(stream, tookCourses, roadUnit)
     );
+
+    this.program.second_year[Stream.TECH].forEach((roadUnit) =>
+      this.processRoadMapPercentage(stream, tookCourses, roadUnit)
+    );
+
+    this.progressPoint.complete();
   }
 
-  processRoadMapPercentage(
+  private processRoadMapPercentage(
     stream: Stream,
     tookCourses: ICourse[],
     roadUnit: ICourse | ICourse[] | ICourse[][]
@@ -339,7 +353,11 @@ export class CourseService {
     }
   }
 
-  findPointOfRoadUnit(steam: Stream, tookCourses: ICourse[], unit: ICourse) {
+  private findPointOfRoadUnit(
+    steam: Stream,
+    tookCourses: ICourse[],
+    unit: ICourse
+  ) {
     const point = {
       stream: Stream.TECH,
       total: 1,
@@ -353,9 +371,10 @@ export class CourseService {
     this.progressPoint.next(point);
   }
 
-  findSastifiedPrerequisitesCourses(
+  private findSastifiedPrerequisitesCourses(
     tookCourses: ICourse[],
-    unit: ICourse | ICourse[]
+    unit: ICourse | ICourse[],
+    streams: Stream[]
   ): ICourse[] {
     if (unit instanceof Array) {
       return unit.reduce((acc: ICourse[], val): ICourse[] => {
@@ -368,6 +387,7 @@ export class CourseService {
               )
           ) || val.prerequisites.some((e) => e.includes('PBDCIS'));
         if (sastified) {
+          val.streams = streams;
           acc.push(val);
         }
         return acc;
@@ -382,6 +402,7 @@ export class CourseService {
             )
         ) || unit.prerequisites.some((e) => e.includes('PBDCIS'));
       if (sastified) {
+        unit.streams = streams;
         return [unit];
       }
     }

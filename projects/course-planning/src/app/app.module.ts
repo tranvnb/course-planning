@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule, Title } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -13,6 +13,14 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SemesterCoursesComponent } from './components/semester-courses/semester-courses.component';
 import { CourseComponent } from './components/course/course.component';
 import { HttpClientModule } from '@angular/common/http';
+// import { CourseService } from './services/course.service';
+// import { Observable } from 'rxjs';
+
+// function initializeAppFactory(
+//   courseService: CourseService
+// ): () => Observable<any> {
+//   return () => courseService.fetchAllData().pipe();
+// }
 
 @NgModule({
   declarations: [
@@ -32,7 +40,15 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserAnimationsModule,
     DragDropModule,
   ],
-  providers: [Title],
+  providers: [
+    Title,
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: initializeAppFactory,
+    //   deps: [CourseService],
+    //   multi: true,
+    // },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

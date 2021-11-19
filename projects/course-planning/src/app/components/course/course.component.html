@@ -1,5 +1,13 @@
 <div class="course">
-  <div class="course-id">{{course?.course_code}}</div>
+  <div class="course-id">
+    {{course?.course_code}}
+    <div class="stream">
+      <mat-icon [style.visibility]="isTechStream ? 'visible' : 'hidden'">phonelink</mat-icon>
+      <mat-icon [style.visibility]="isDataStream ? 'visible' : 'hidden'">storage</mat-icon>
+      <mat-icon [style.visibility]="isSecurityStream ? 'visible' : 'hidden'">security</mat-icon>
+    </div>
+  </div>
+
   <div class="course-title">{{course?.title}}</div>
   <div>Credit: {{course?.credit}}</div>
 </div>

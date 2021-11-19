@@ -1,6 +1,8 @@
+import { Stream } from './IStream';
+
 export interface ICourse {
   url?: string;
-  courseId?: string;
+  streams?: Stream[];
   course_code: string;
   title: string;
   credit: number | string;
