@@ -25,10 +25,10 @@ export class PlanningBoardComponent implements OnInit {
   semesterList: ISemester[] = [];
 
   ngOnInit(): void {
-    console.debug('Dashboard init');
-    this.courseService.fetchAllData();
-    this.getAvailableCourses();
-    this.getSemesters();
+    this.courseService.fetchAllData().subscribe(() => {
+      this.getAvailableCourses();
+      this.getSemesters();
+    });
   }
 
   getSemesters(): void {

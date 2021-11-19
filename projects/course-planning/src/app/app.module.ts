@@ -14,7 +14,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SemesterCoursesComponent } from './components/semester-courses/semester-courses.component';
 import { CourseComponent } from './components/course/course.component';
 import { HttpClientModule } from '@angular/common/http';
-import { ProgressComponent } from './progress/progress.component';
+import { ProgressComponent } from './components/progress/progress.component';
 
 @NgModule({
   declarations: [
