@@ -1,11 +1,11 @@
-export enum Stream {
+export enum StreamEnum {
   TECH = 'emmerge_tech',
   DATA = 'data_analysis',
   SECURITY = 'security',
 }
 
 export interface IStream {
-  name: Stream;
+  name: StreamEnum;
   totalCredit: number;
   completedCredit: number;
 }

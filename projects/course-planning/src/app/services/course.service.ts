@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, EMPTY, from, Observable, of } from 'rxjs';
-import { filter, map, reduce, scan, tap } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { map, reduce, tap } from 'rxjs/operators';
 import { ICourse } from '../interfaces/ICourse';
 import { ISemester } from '../interfaces/ISemester';
 import { CoursePrerequisite } from '../interfaces/CoursePrerequisites';
@@ -8,18 +8,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { COURSE_PREREQUISITES, PROGRAM } from './program-courses';
 import { IProgram } from '../interfaces/IProgram';
-import { Stream, IStream } from '../interfaces/IStream';
+import { StreamEnum } from '../interfaces/IStream';
+import { IProgress, IProgressPoint } from '../interfaces/IProgress';
 
 // type FinishPoint = { point: number; completed: number };
-type ProgressPoint = {
-  stream: Stream;
-  total: number;
-  completed: number;
-};
-
-type Progress = {
-  [keys: string]: IStream;
-};
 
 @Injectable({
   providedIn: 'root',
@@ -29,9 +21,9 @@ export class CourseService {
 
   private semesterList = new BehaviorSubject<ISemester[]>([]);
 
-  private progress = new BehaviorSubject<Progress>({});
-  private progressPoint = new BehaviorSubject<ProgressPoint>({
-    stream: Stream.TECH,
+  private progress = new BehaviorSubject<IProgress>({});
+  private progressPoint = new BehaviorSubject<IProgressPoint>({
+    stream: StreamEnum.TECH,
     total: 0,
     completed: 0,
   });
@@ -114,8 +106,8 @@ export class CourseService {
   }
 
   private resetRoadMapPercentage(): void {
-    this.progressPoint = new BehaviorSubject<ProgressPoint>({
-      stream: Stream.TECH,
+    this.progressPoint = new BehaviorSubject<IProgressPoint>({
+      stream: StreamEnum.TECH,
       total: 0,
       completed: 0,
     });
@@ -123,7 +115,7 @@ export class CourseService {
     this.progressPoint
       .pipe(
         // accumulate the progress
-        reduce((acc: Progress, val: ProgressPoint) => {
+        reduce((acc: IProgress, val: IProgressPoint) => {
           if (acc[val.stream] === undefined) {
             acc[val.stream] = {
               name: val.stream,
@@ -135,7 +127,7 @@ export class CourseService {
           acc[val.stream].completedCredit += val.completed;
           return acc;
         }),
-        tap((c: Progress) => console.table(c))
+        tap((c: IProgress) => console.table(c))
       )
       .subscribe(() => {});
   }
@@ -144,7 +136,7 @@ export class CourseService {
     return this.availableCourses.asObservable();
   }
 
-  getProgramProgress(): Observable<Progress> {
+  getProgramProgress(): Observable<IProgress> {
     return this.progress.asObservable();
   }
 
@@ -183,22 +175,22 @@ export class CourseService {
     // compute the available courses and create progress value for each program
     this.program.first_year.forEach((roadUnit) =>
       this.processRoadMapUnit(tookCourses, roadUnit, [
-        Stream.TECH,
-        Stream.DATA,
-        Stream.SECURITY,
+        StreamEnum.TECH,
+        StreamEnum.DATA,
+        StreamEnum.SECURITY,
       ])
     );
 
-    this.program.second_year[Stream.TECH].forEach((roadUnit) =>
-      this.processRoadMapUnit(tookCourses, roadUnit, [Stream.TECH])
+    this.program.second_year[StreamEnum.TECH].forEach((roadUnit) =>
+      this.processRoadMapUnit(tookCourses, roadUnit, [StreamEnum.TECH])
     );
 
-    this.program.second_year[Stream.DATA].forEach((roadUnit) =>
-      this.processRoadMapUnit(tookCourses, roadUnit, [Stream.DATA])
+    this.program.second_year[StreamEnum.DATA].forEach((roadUnit) =>
+      this.processRoadMapUnit(tookCourses, roadUnit, [StreamEnum.DATA])
     );
 
-    this.program.second_year[Stream.SECURITY].forEach((roadUnit) =>
-      this.processRoadMapUnit(tookCourses, roadUnit, [Stream.SECURITY])
+    this.program.second_year[StreamEnum.SECURITY].forEach((roadUnit) =>
+      this.processRoadMapUnit(tookCourses, roadUnit, [StreamEnum.SECURITY])
     );
 
     this.setOfCourses.complete();
@@ -217,7 +209,7 @@ export class CourseService {
   private processRoadMapUnit(
     tookCourses: ICourse[],
     roadUnit: ICourse | ICourse[] | ICourse[][],
-    streams: Stream[]
+    streams: StreamEnum[]
   ): void {
     // road unit is an option
     if (roadUnit instanceof Array) {
@@ -283,7 +275,7 @@ export class CourseService {
   }
 
   private computeRoadMapPercentage(): void {
-    const stream = Stream.TECH;
+    const stream = StreamEnum.TECH;
 
     this.resetRoadMapPercentage();
 
@@ -298,7 +290,7 @@ export class CourseService {
       this.processRoadMapPercentage(stream, tookCourses, roadUnit)
     );
 
-    this.program.second_year[Stream.TECH].forEach((roadUnit) =>
+    this.program.second_year[StreamEnum.TECH].forEach((roadUnit) =>
       this.processRoadMapPercentage(stream, tookCourses, roadUnit)
     );
 
@@ -306,7 +298,7 @@ export class CourseService {
   }
 
   private processRoadMapPercentage(
-    stream: Stream,
+    stream: StreamEnum,
     tookCourses: ICourse[],
     roadUnit: ICourse | ICourse[] | ICourse[][]
   ) {
@@ -354,12 +346,12 @@ export class CourseService {
   }
 
   private findPointOfRoadUnit(
-    steam: Stream,
+    stream: StreamEnum,
     tookCourses: ICourse[],
     unit: ICourse
   ) {
     const point = {
-      stream: Stream.TECH,
+      stream: StreamEnum.TECH,
       total: 1,
       completed: 1,
     };
@@ -374,7 +366,7 @@ export class CourseService {
   private findSastifiedPrerequisitesCourses(
     tookCourses: ICourse[],
     unit: ICourse | ICourse[],
-    streams: Stream[]
+    streams: StreamEnum[]
   ): ICourse[] {
     if (unit instanceof Array) {
       return unit.reduce((acc: ICourse[], val): ICourse[] => {

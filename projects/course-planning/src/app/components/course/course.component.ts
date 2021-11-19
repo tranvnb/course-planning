@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ICourse } from '../../interfaces/ICourse';
-import { Stream } from '../../interfaces/IStream';
+import { StreamEnum } from '../../interfaces/IStream';
 
 @Component({
   selector: 'cp-course',
@@ -20,12 +20,13 @@ export class CourseComponent implements OnInit {
 
   ngOnInit(): void {
     this.isTechStream =
-      this.course.streams?.filter((s) => s === Stream.TECH).length !== 0;
+      this.course.streams?.filter((s) => s === StreamEnum.TECH).length !== 0;
 
     this.isDataStream =
-      this.course.streams?.filter((s) => s === Stream.DATA).length !== 0;
+      this.course.streams?.filter((s) => s === StreamEnum.DATA).length !== 0;
 
     this.isSecurityStream =
-      this.course.streams?.filter((s) => s === Stream.SECURITY).length !== 0;
+      this.course.streams?.filter((s) => s === StreamEnum.SECURITY).length !==
+      0;
   }
 }

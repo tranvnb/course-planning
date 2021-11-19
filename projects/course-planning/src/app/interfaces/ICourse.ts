@@ -1,8 +1,8 @@
-import { Stream } from './IStream';
+import { StreamEnum } from './IStream';
 
 export interface ICourse {
   url?: string;
-  streams?: Stream[];
+  streams?: StreamEnum[];
   course_code: string;
   title: string;
   credit: number | string;
