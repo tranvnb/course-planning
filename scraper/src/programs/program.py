@@ -101,7 +101,7 @@ class Program:
         secondYear = []
 
         # get html content from douglas website
-        url = self.domain_name + "/course/csis-4495"
+        # url = self.domain_name + "/course/csis-4495"
         
         # result = requests.get(url, headers=self.requestHeaders())		
         # self.save_file_content(self.current_path + "/4495-prerequisites.txt", result.text)
@@ -111,8 +111,8 @@ class Program:
         soup = BeautifulSoup(result.text, "html.parser")
         # self.save_file_content(self.current_path + "/data.txt", result.text)
 
-        result = self.get_file_content(self.current_path + "/data.txt")
-        soup = BeautifulSoup(result, "html.parser")
+        # result = self.get_file_content(self.current_path + "/data.txt")
+        # soup = BeautifulSoup(result, "html.parser")
         
         course_table = soup.find(id='block-views-block-program-guidelines-block-4').find("table")
         year1 = "Year I Coursework" 

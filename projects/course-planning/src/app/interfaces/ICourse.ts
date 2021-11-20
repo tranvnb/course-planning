@@ -1,7 +1,11 @@
+import { StreamEnum } from './IStream';
+
 export interface ICourse {
-  courseId: string;
+  url?: string;
+  streams?: StreamEnum[];
+  course_code: string;
   title: string;
-  credit: number;
-  // instructor: String;
-  // course_id: String;  // Course CRN
+  credit: number | string;
+  prerequisitesStr?: string;
+  prerequisites: string[][];
 }

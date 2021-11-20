@@ -1,0 +1,15 @@
+.progress-bar {
+  & + & {
+    margin-top: 5px;
+  }
+  .mat-icon {
+    // float: left;
+    // position: relative;
+    // top: -10px;
+    // margin-right: 10px;
+  }
+
+  .mat-progress-bar {
+    // width: auto;
+  }
+}
