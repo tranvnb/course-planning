@@ -23,6 +23,11 @@ RUN npm run build
 
 FROM nginx
 
-COPY ./nginx-config/default.conf /etc/nginx/conf.d/default/default.conf
+COPY --from=builder /srv/angular/nginx-config/default.conf /etc/nginx/conf.d/default/default.conf
 
 COPY --from=builder /srv/angular/dist/course-planning /usr/share/nginx/html
+
+#CMD /bin/bash -c "envsubst '\$PORT' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf" && nginx -g 'daemon off;'
+RUN echo "Assign port to Dyno: "$PORT
+EXPOSE $PORT
+CMD sed -i -e 's/$PORT'"$PORT"'/g' /etc/nginx/conf.d/default/default.conf && nginx -g 'daemon off;'
