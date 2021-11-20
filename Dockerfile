@@ -17,6 +17,8 @@ COPY . .
 
 WORKDIR /srv/angular/
 
+#RUN npm install -g npm@8.1.4
+
 RUN npm install
 
 RUN npm run build
