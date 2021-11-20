@@ -1,5 +1,6 @@
 setup:
   config:
+    DATABASE_URI: mongodb+srv://<username>:<password>@<database-host>/<database>?retryWrites=true
 build:
   docker:
     web: Dockerfile
