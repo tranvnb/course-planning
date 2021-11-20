@@ -1,4 +1,4 @@
-FROM node:latest as builder
+FROM node:16.13.0 as builder
 MAINTAINER BrianVo vnbaotran@gmail.com
 
 # Set Environment Variables
@@ -16,6 +16,8 @@ WORKDIR /srv/angular
 COPY . .
 
 WORKDIR /srv/angular/
+
+#RUN npm install -g npm@8.1.4
 
 RUN npm install
 
