@@ -25,7 +25,7 @@ RUN npm run build
 
 FROM nginx
 
-COPY --from=builder ./nginx-config/default.conf /etc/nginx/conf.d/default/default.conf
+COPY --from=builder /srv/angular/nginx-config/default.conf /etc/nginx/conf.d/default/default.conf
 
 COPY --from=builder /srv/angular/dist/course-planning /usr/share/nginx/html
 
