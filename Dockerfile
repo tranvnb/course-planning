@@ -29,7 +29,11 @@ COPY --from=builder /srv/angular/nginx-config/default.conf /etc/nginx/conf.d/def
 
 COPY --from=builder /srv/angular/dist/course-planning /usr/share/nginx/html
 
-CMD /bin/sh -c "envsubst '\$PORT' < /etc/nginx/conf.d/default/default.conf > /etc/nginx/conf.d/default/default.conf" && nginx -g 'daemon off;'
+RUN chmod +x ./docker-entrypoint.sh
+
+ENTRYPOINT ["./docker-entrypoint-prod.sh"]
+
+#CMD /bin/sh -c "envsubst '\$PORT' < /etc/nginx/conf.d/default/default.conf > /etc/nginx/conf.d/default/default.conf" && nginx -g 'daemon off;'
 #RUN echo "Assign port to Dyno: "$PORT
 #EXPOSE $PORT
 #CMD sed -i -e 's/$PORT'"$PORT"'/g' /etc/nginx/conf.d/default/default.conf && nginx -g 'daemon off;'
