@@ -1,4 +1,4 @@
-FROM node as builder
+FROM node:latest as builder
 MAINTAINER BrianVo vnbaotran@gmail.com
 
 # Set Environment Variables
