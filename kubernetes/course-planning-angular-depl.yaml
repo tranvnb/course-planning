@@ -37,6 +37,7 @@ spec:
               '-ce',
               'cd /hostpath-claim/;npm install @angular/cli;npm run start;',
             ]
+          # command: ["/bin/bash" , "-c" , "envsubst '$PORT' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"] # replace PORT value from environment
           # command: [ "/bin/bash", "-ce", "tail -f /dev/null" ] # run the container forever
           # args:
           #   - "-ce"

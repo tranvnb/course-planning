@@ -41,6 +41,26 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 ## Deploy
 
+### Heroku
+
+Run `curl https://cli-assets.heroku.com/install-ubuntu.sh | sh` to install Heroku. On other environment please refer [heroku guide](https://devcenter.heroku.com/articles/heroku-cli)
+
+Run `heroku login` login to heroku cli
+
+Run `heroku stack:set container` to switch to heroku container mode
+
+Update back end location variable `APP_URL` in `/projects/course-planning/src/environments/environment.ts` & `/projects/course-planning/src/environments/environment.prod.ts` according to your setting.
+
+Get the git url project from heroku, typically https://git.heroku.com/[your-app-name].git
+
+Run `git remote add heroku https://git.heroku.com/[your-app-name].git` to add remote branch to your current working git repos
+
+Push code to start build `git push heroku main`.
+
+Heroku will be the rest for you.
+
+> NOTE: Adjust nginx configuration in ./nginx-config/nginx.conf & ./nginx-config/default.conf to math your security requirements or appy ssl certification
+
 ### Kubernetes
 
 Access to kubernetes cluster console and apply deployment files follow the order below
