@@ -1,6 +1,7 @@
 node_modules
 kubernetes
 scraper
+.angular
 .git
 .gitignore
 .vscode

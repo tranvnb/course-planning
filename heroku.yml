@@ -4,3 +4,5 @@ setup:
 build:
   docker:
     web: Dockerfile
+run:
+  web: rm -f /app/angular.json

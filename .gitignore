@@ -183,5 +183,5 @@ dmypy.json
 cython_debug/
 
 # angular
-.angular
+.angular/
 .angular/**
