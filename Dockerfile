@@ -13,11 +13,7 @@ RUN mkdir -p /srv/angular
 
 WORKDIR /srv/angular
 
-COPY . .
-
-WORKDIR /srv/angular/
-
-#RUN npm install -g npm@8.1.4
+COPY . ./
 
 RUN npm install
 
@@ -25,8 +21,13 @@ RUN npm run build
 
 FROM nginx
 
-COPY --from=builder /srv/angular/nginx-config/default.conf /etc/nginx/conf.d/default/default.conf
+COPY ./nginx-config/nginx.conf /etc/nginx/
 
-COPY --from=builder /srv/angular/dist/course-planning /usr/share/nginx/html
+COPY ./nginx-config/default.conf /etc/nginx/templates/default.conf.template
 
-EXPOSE 80, 8080
+# using nginx template as verion after 1.19
+#COPY ./nginx-config/default.conf /etc/nginx/templates/default.conf.template
+
+COPY --from=builder /srv/angular/dist/course-planning/* /usr/share/nginx/html
+
+CMD ["/bin/bash" , "-c" , "envsubst '$PORT' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
