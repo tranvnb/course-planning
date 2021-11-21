@@ -53,7 +53,7 @@ Run `heroku stack:set container` to switch to heroku container mode
 
 Update back end location variable `APP_URL` in `/projects/course-planning/src/environments/environment.ts` & `/projects/course-planning/src/environments/environment.prod.ts` according to your setting.
 
-Get the git url project from heroku, typically https://git.heroku.com/[your-app-name].git
+Get the git url project from heroku, typically `https://git.heroku.com/[your-app-name].git`
 
 Run `git remote add heroku https://git.heroku.com/[your-app-name].git` to add remote branch to your current working git repos
 
