@@ -1,8 +1,10 @@
-# CoursePlanning
+# CoursePlanning 
+
+[Demo](https://programplanning.herokuapp.com)
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.2.
 
-![image](https://user-images.githubusercontent.com/9379521/140168222-4e8db2c5-f364-4c8c-b650-3f6bd5883238.png)
+![image](https://user-images.githubusercontent.com/9379521/142751147-f3b026b8-35f7-4214-a1e4-fcf6399f0dbb.png)
 
 ## Development server
 
