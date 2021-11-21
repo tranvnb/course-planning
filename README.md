@@ -2,7 +2,7 @@
 
 [Demo](https://programplanning.herokuapp.com)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.2.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.0.3
 
 ![image](https://user-images.githubusercontent.com/9379521/142751147-f3b026b8-35f7-4214-a1e4-fcf6399f0dbb.png)
 
