@@ -58,48 +58,6 @@ export class CourseService {
     this.setOfCourses = new BehaviorSubject<ICourse[]>([]);
     this.setOfCourses
       .pipe(
-        // reduce((acc: ICourse[], val: ICourse[]) => {
-        //   // beauty of stream and events
-        //   const tempArr: ICourse[] = [];
-        //   from(val)
-        //     .pipe(
-        //       map((v) => {
-        //         const foundCourse = acc.find(
-        //           (a) => a.course_code === v.course_code
-        //         );
-
-        //         // only merge streams if duplicated course and has new stream
-        //         if (foundCourse !== undefined) {
-        //           // check the stream in order to merge
-        //           const newStreams = foundCourse.streams?.filter(
-        //             (mstr) => !v.streams?.includes(mstr)
-        //           );
-
-        //           if (newStreams === undefined || newStreams?.length <= 0) {
-        //             return undefined;
-        //           } else {
-        //             v.streams?.push(...newStreams);
-        //             return v;
-        //           }
-        //         } else {
-        //           return v;
-        //         }
-        //       })
-        //     )
-        //     .subscribe((v) => {
-        //       if (v !== undefined) {
-        //         tempArr.push(v);
-        //       }
-        //     });
-
-        //   acc.push(...tempArr);
-        //   // acc.push(
-        //   //   ...val.filter((v) =>
-        //   //     acc.every((a) => a.course_code !== v.course_code)
-        //   //   )
-        //   // );
-        //   return acc;
-        // }),
         reduce(
           (acc: ICourse[], val: ICourse[]) =>
             this.aggregateAndMergeCourse(acc, val),
@@ -112,35 +70,6 @@ export class CourseService {
   private aggregateAndMergeCourse(acc: ICourse[], val: ICourse[]): ICourse[] {
     // beauty of stream and events
     const tempArr: ICourse[] = [];
-
-    // from([...acc, ...val])
-    //   .pipe(
-    //     map((a) => {
-    //       const foundCourse = val.find((v) => a.course_code === v.course_code);
-
-    //       // only merge streams if duplicated course and has new stream
-    //       if (foundCourse !== undefined) {
-    //         // check the stream in order to merge
-    //         const newStreams = foundCourse.streams?.filter(
-    //           (mstr) => !a.streams?.includes(mstr)
-    //         );
-
-    //         if (newStreams === undefined || newStreams?.length <= 0) {
-    //           return undefined;
-    //         } else {
-    //           a.streams?.push(...newStreams);
-    //           return a;
-    //         }
-    //       } else {
-    //         return a;
-    //       }
-    //     })
-    //   )
-    //   .subscribe((v) => {
-    //     if (v !== undefined) {
-    //       tempArr.push(v);
-    //     }
-    //   });
 
     from(val)
       .pipe(
@@ -317,23 +246,10 @@ export class CourseService {
           );
           if (doneCourses.length > 0) {
             this.setOfCourses.next(doneCourses);
-            // this.progressPoint.next({
-            //   stream: Stream.TECH,
-            //   total: 1,
-            //   completed: 1,
-            // });
           }
         }
       });
 
-      // after calculate the percentage and the number of completed courses on each road unit
-      // if (roadUnitCompletedCourses > 0) {
-      //   this.progressPoint.next({
-      //     stream: Stream.TECH,
-      //     total: roadUnitTotalCourses,
-      //     completed: roadUnitCompletedCourses,
-      //   });
-      // }
     }
     // road unit is a course
     else {
