@@ -301,11 +301,14 @@ class Program:
         # Total Year II Credits
 
         dictionary = {
-            "first_year" : first_year,
-            "second_year": {
-                "emmerge-tech" : stream1, 
-                "data-analysis": stream2, 
-                "security": stream3
+            "code": "PBDCIS",
+            "data": {
+                "first_year" : first_year,
+                "second_year": {
+                    "emmerge-tech" : stream1, 
+                    "data-analysis": stream2, 
+                    "security": stream3
+                }
             }
         }
         
