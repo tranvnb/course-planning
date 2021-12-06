@@ -27,6 +27,8 @@ to build docker image and then start docker container. Navigate to `http://local
 
 ## Build
 
+Update `environment.prod.ts` for the production back end API url.
+
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 Run
