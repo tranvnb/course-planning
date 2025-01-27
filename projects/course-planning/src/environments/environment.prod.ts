@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  process.env.API_URL: 'https://cobalt-rectangular-english.glitch.me',
+  API_URL: 'https://course-planning-backend.onrender.com',
 };
