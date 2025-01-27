@@ -1,6 +1,6 @@
 # CoursePlanning
 
-[Demo](https://programplanning.herokuapp.com)
+[Demo](https://course-planning.onrender.com/dashboard)
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.0.3
 
@@ -45,31 +45,9 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 ## Deploy
 
-### Heroku
+### Render
 
-Run `curl https://cli-assets.heroku.com/install-ubuntu.sh | sh` to install Heroku. On other environment please refer [heroku guide](https://devcenter.heroku.com/articles/heroku-cli)
-
-Run `heroku login` login to heroku cli
-
-Run `heroku stack:set container` to switch to heroku container mode
-
-Update back end location variable `APP_URL` in `environment.ts` & `environment.prod.ts` according to your setting.
-
-Get the git url project from heroku, typically `https://git.heroku.com/[your-app-name].git`
-
-Run
-
-```bash
-  $ git remote add heroku https://git.heroku.com/[your-app-name].git`
-```
-
-to add remote branch to your current working git repos
-
-Push code to start build `git push heroku main`.
-
-Heroku will be the rest for you.
-
-> NOTE: Adjust nginx configuration in ./nginx-config/nginx.conf & ./nginx-config/default.conf to math your security requirements or appy ssl certification
+This web app was deployed to Render.com service under free layer.
 
 ### Kubernetes
 
